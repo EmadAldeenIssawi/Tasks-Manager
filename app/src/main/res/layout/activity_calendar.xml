@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#C3C6C8"
+    android:backgroundTint="#C3C6C8"
+    android:theme="@style/Theme.TasksManager"
+
+    tools:context=".Calendar">
+
+    <CalendarView
+
+        android:id="@+id/calendarView2"
+        android:layout_width="245dp"
+        android:layout_height="313dp"
+        android:clickable="true"
+        android:contextClickable="true"
+        android:defaultFocusHighlightEnabled="true"
+
+        android:longClickable="false"
+        android:selectedDateVerticalBar="@color/purple_700"
+        android:selectedWeekBackgroundColor="@color/white"
+        android:weekNumberColor="@color/white"
+        android:weekSeparatorLineColor="@color/white"
+        app:layout_constraintBottom_toTopOf="@+id/guideline5"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        tools:ignore="DuplicateClickableBoundsCheck,DuplicateClickableBoundsCheck" />
+
+    <Button
+        android:id="@+id/buttonAddEventToCal"
+        android:layout_width="110dp"
+        android:layout_height="47dp"
+
+        android:layout_marginTop="20dp"
+        android:backgroundTint="#3F51B5"
+        android:onClick="addEventButton"
+        android:text="Add Event"
+        android:textSize="10sp"
+        app:layout_constraintEnd_toStartOf="@+id/guideline3"
+        app:layout_constraintStart_toStartOf="@+id/guideline2"
+        app:layout_constraintTop_toBottomOf="@+id/clearAll" />
+
+    <Button
+        android:id="@+id/selectEvents"
+        android:layout_width="110dp"
+        android:layout_height="47dp"
+        android:layout_marginTop="28dp"
+        android:autoSizeTextType="none"
+        android:backgroundTint="#3F51B5"
+        android:onClick="selectEvents"
+        android:text="Select"
+        android:textSize="10sp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/guideline5"
+        app:layout_constraintEnd_toStartOf="@+id/guideline3"
+        app:layout_constraintStart_toStartOf="@+id/guideline2"
+        app:layout_constraintTop_toBottomOf="@+id/RemoveAllEvents"
+        app:layout_constraintVertical_bias="0.005" />
+
+    <Button
+        android:id="@+id/removeEvents"
+        android:layout_width="49dp"
+        android:layout_height="47dp"
+
+        android:layout_marginBottom="8dp"
+        android:backgroundTint="#3F51B5"
+        android:drawableBottom="@android:drawable/ic_menu_delete"
+        android:gravity="bottom"
+        android:onClick="removeEvents"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/eventsScrollView"
+        app:layout_constraintEnd_toStartOf="@+id/guideline2"
+        app:layout_constraintHorizontal_bias="0.242"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline5"
+        app:layout_constraintVertical_bias="0.555" />
+
+    <Button
+        android:id="@+id/RemoveAllEvents"
+        android:layout_width="110dp"
+        android:layout_height="47dp"
+        android:layout_marginTop="24dp"
+        android:backgroundTint="#3F51B5"
+        android:onClick="removeAllEvents"
+        android:text="Remove All"
+        android:textSize="10sp"
+        android:visibility="visible"
+        app:layout_constraintEnd_toStartOf="@+id/guideline3"
+        app:layout_constraintStart_toStartOf="@+id/guideline2"
+        app:layout_constraintTop_toBottomOf="@+id/buttonAddEventToCal" />
+
+    <Button
+        android:id="@+id/clearAll"
+        android:layout_width="129dp"
+        android:layout_height="47dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="4dp"
+        android:backgroundTint="#7A1436"
+        android:onClick="clearAllEvents"
+        android:text="Clear all events"
+        android:textSize="10sp"
+        app:icon="@android:drawable/ic_delete"
+        app:iconSize="12dp"
+        app:layout_constraintEnd_toStartOf="@+id/guideline3"
+        app:layout_constraintHorizontal_bias="0.666"
+        app:layout_constraintStart_toStartOf="@+id/guideline2"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.59"/>
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.99" />
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.54" />
+
+    <TextView
+        android:id="@+id/eventTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="96dp"
+        android:layout_marginBottom="288dp"
+        android:text="Events"
+
+        android:textColor="@color/black"
+        android:textStyle="italic"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/guideline2"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline5"
+        app:layout_constraintVertical_bias="1.0"
+        tools:visibility="invisible" />
+
+    <TextView
+        android:id="@+id/daysTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="288dp"
+        android:text="Days"
+        android:textColor="@color/black"
+
+        android:textStyle="italic"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.463"
+        app:layout_constraintStart_toStartOf="@+id/guideline2"
+        app:layout_constraintTop_toTopOf="@+id/guideline5"
+        app:layout_constraintVertical_bias="1.0"
+        tools:visibility="invisible" />
+
+    <ScrollView
+        android:id="@+id/eventsScrollView"
+        android:layout_width="228dp"
+        android:layout_height="190dp"
+        android:layout_marginBottom="72dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/guideline2"
+        app:layout_constraintHorizontal_bias="0.933"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline5"
+        app:layout_constraintVertical_bias="0.986">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+    </ScrollView>
+
+    <ScrollView
+        android:id="@+id/scrollViewEventsDays"
+        android:layout_width="wrap_content"
+        android:layout_height="194dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.466"
+        app:layout_constraintStart_toStartOf="@+id/guideline2"
+        app:layout_constraintTop_toTopOf="@+id/guideline5"
+        app:layout_constraintVertical_bias="0.514">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+    </ScrollView>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

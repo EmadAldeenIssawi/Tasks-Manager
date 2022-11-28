@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+
+    android:id="@+id/background"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#C3C6C8"
+    android:backgroundTint="#C3C6C8"
+
+    tools:context=".MainActivity">
+
+
+    <Button
+        android:id="@+id/dailyMissionButton3"
+        android:layout_width="210dp"
+        android:layout_height="50dp"
+        android:backgroundTint="#3F51B5"
+        android:onClick="monthlyMissionsPageGo"
+        android:text="Monthly Tasks"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.499"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.77" />
+
+    <Button
+        android:id="@+id/calendarButton"
+        android:layout_width="210dp"
+        android:layout_height="50dp"
+        android:backgroundTint="#3F51B5"
+        android:onClick="calenderPageGo"
+        android:text="Calendar"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.499"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.227" />
+
+    <Button
+        android:id="@+id/dailyMissionButton"
+        android:layout_width="210dp"
+        android:layout_height="50dp"
+        android:backgroundTint="#3F51B5"
+        android:onClick="DailyMissionsPageGo"
+        android:text="Daily Missions"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.499"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.498" />
+
+    <ImageView
+        android:id="@+id/helpImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.091"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.498"
+        tools:ignore="MissingConstraints"
+        tools:srcCompat="@tools:sample/avatars"
+        tools:visibility="invisible" />
+</androidx.constraintlayout.widget.ConstraintLayout>
