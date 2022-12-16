@@ -68,6 +68,7 @@
         android:layout_width="49dp"
         android:layout_height="47dp"
 
+        android:layout_marginStart="24dp"
         android:layout_marginBottom="8dp"
         android:backgroundTint="#3F51B5"
         android:drawableBottom="@android:drawable/ic_menu_delete"
@@ -75,11 +76,11 @@
         android:onClick="removeEvents"
         android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/eventsScrollView"
-        app:layout_constraintEnd_toStartOf="@+id/guideline2"
-        app:layout_constraintHorizontal_bias="0.242"
+        app:layout_constraintEnd_toStartOf="@+id/eventTextView"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline5"
-        app:layout_constraintVertical_bias="0.555" />
+        app:layout_constraintVertical_bias="0.777" />
 
     <Button
         android:id="@+id/RemoveAllEvents"

@@ -111,6 +111,7 @@ public class MonthlyTasksPage extends AppCompatActivity {
      * update the checkBoxes Check state based on the the array list bb contain if its 1 change to true otherwise to false
      */
     private void updateCheckBoxes() {
+        linearLayout.removeAllViews();
         ArrayList<Integer> bb = new ArrayList<Integer>();
         for (int i = 0; i < bolleansMCB.length ; i++) {
             bb.add(i, bolleansMCB[i]);

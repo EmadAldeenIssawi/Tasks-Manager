@@ -186,6 +186,7 @@ public class Calendar extends AppCompatActivity {
                 textView.setText(s);
 
                 CheckBox checkBox = new CheckBox(this);
+                checkBox.setVisibility(View.INVISIBLE);
                 checkBox.setOnCheckedChangeListener(new EventCheck());
               //TextViewCompat.setAutoSizeTextTypeWithDefaults(textView,TextViewCompat.AUTO_SIZE_TEXT_TYPE_UNIFORM);
                 //row.addView(checkBox,0);
@@ -205,6 +206,7 @@ public class Calendar extends AppCompatActivity {
             }
 
         }
+       showCheckBoxes();
     }
 
     /**
@@ -334,6 +336,41 @@ public class Calendar extends AppCompatActivity {
                 findViewById(R.id.removeEvents).setVisibility(View.INVISIBLE);
 
             }
+        }
+    }
+
+    /**
+     * show checkboxes in the scrollview based on if the select button is already clicked or not
+     */
+    public void showCheckBoxes(){
+        if (selectClick == 1) {
+            for (int i = 0; i < linearLayout2.getChildCount(); i++) {
+                TableRow row = (TableRow) linearLayout2.getChildAt(i);
+                CheckBox cb = (CheckBox) row.getChildAt(0);
+
+                cb.setVisibility(View.VISIBLE);
+            }
+/*
+            selectClick++;
+            findViewById(R.id.selectEvents).setBackgroundColor(Color.DKGRAY);
+            if(thereCheckBoxChecked)findViewById(R.id.removeEvents).setVisibility(View.VISIBLE);
+
+
+ */
+
+        } else if (selectClick == 0) {
+            for (int i = 0; i < linearLayout2.getChildCount(); i++) {
+                TableRow row = (TableRow) linearLayout2.getChildAt(i);
+                CheckBox cb = (CheckBox) row.getChildAt(0);
+
+                cb.setVisibility(View.INVISIBLE);
+            }
+            /*selectClick--;
+            findViewById(R.id.selectEvents).setBackgroundColor(ResourcesCompat.getColor(getResources(), R.color.naivy, null)); //without theme
+            findViewById(R.id.removeEvents).setVisibility(View.INVISIBLE);
+
+
+             */
         }
     }
 

@@ -9,7 +9,7 @@
     tools:context=".Calendar">
 
     <TextView
-        android:id="@+id/eventTextView2"
+        android:id="@+id/eventTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="264dp"
@@ -19,26 +19,27 @@
         android:textStyle="italic"
         app:layout_constraintBottom_toTopOf="@+id/eventsScrollView"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.917"
+        app:layout_constraintHorizontal_bias="0.909"
         app:layout_constraintStart_toStartOf="@+id/guideline7"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0"
+        app:layout_constraintTop_toBottomOf="@+id/selectEvents"
+        app:layout_constraintVertical_bias="0.851"
         tools:visibility="invisible" />
 
     <TextView
         android:id="@+id/daysTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
+        android:layout_width="34dp"
+        android:layout_height="15dp"
+        android:layout_marginEnd="52dp"
+        android:layout_marginBottom="32dp"
         android:text="Days"
         android:textColor="@color/black"
         android:textStyle="italic"
         app:layout_constraintBottom_toTopOf="@+id/scrollViewEventsDays"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.925"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.901"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="@+id/guideline7"
+        app:layout_constraintTop_toBottomOf="@+id/RemoveAllEvents"
+        app:layout_constraintVertical_bias="1.0"
         tools:visibility="invisible" />
 
     <ScrollView
@@ -47,10 +48,10 @@
         android:layout_height="190dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.157"
+        app:layout_constraintHorizontal_bias="0.161"
         app:layout_constraintStart_toStartOf="@+id/guideline7"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.542">
+        app:layout_constraintVertical_bias="0.705">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -66,7 +67,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.552">
+        app:layout_constraintVertical_bias="0.7">
 
         <LinearLayout
             android:layout_width="match_parent"

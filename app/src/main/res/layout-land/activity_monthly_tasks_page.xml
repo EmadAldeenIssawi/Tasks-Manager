@@ -10,8 +10,8 @@
 
     <ScrollView
         android:id="@+id/monthlyTasksScrollview"
-        android:layout_width="331dp"
-        android:layout_height="373dp"
+        android:layout_width="281dp"
+        android:layout_height="301dp"
         android:layout_marginStart="4dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/guideline8"

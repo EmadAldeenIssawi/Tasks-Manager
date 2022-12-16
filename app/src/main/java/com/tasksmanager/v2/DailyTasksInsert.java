@@ -10,6 +10,8 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.Arrays;
+
 public class DailyTasksInsert extends AppCompatActivity {
 
     private EditText editText;
@@ -49,6 +51,13 @@ public class DailyTasksInsert extends AppCompatActivity {
 
         }
     }
+    public Boolean removeEmptyRows(String[] lines){
+        if (lines[lines.length].contains("[a-zA-Z]+") | lines[lines.length].contains("[0-9]+")){
+            return true;
+        }
+        lines[lines.length]=null;
+        return false;
+    }
 
     /**
      * saveDailyMission Save button Function which save the event
@@ -63,7 +72,13 @@ public class DailyTasksInsert extends AppCompatActivity {
             Toast.makeText(this,"Enter a mission",Toast.LENGTH_LONG).show();
         }
         else{
-            setDes(String.valueOf(editText.getText()));
+            des =String.valueOf(editText.getText());
+            des = des.replace("\n", "");
+            //String[] lines = text.split("\\n");
+            //removeEmptyRows(lines);
+            //String des= Arrays.toString(lines);
+
+            setDes(des);
             if(incomigIntent.equals("DailyTasksPage")){
                 Intent i= new Intent(this,DailyTasksPage.class);
                 i.putExtra("eventDescription",des);

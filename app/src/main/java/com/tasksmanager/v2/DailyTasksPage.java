@@ -11,6 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
@@ -115,7 +116,7 @@ public class DailyTasksPage extends AppCompatActivity {
     private void updateCheckBoxes() {
 
 
-
+        linearLayout.removeAllViews();
 
         ArrayList<Integer> bb = new ArrayList<Integer>();
         for (int i = 0; i < bolleansDCB.length ; i++) {
@@ -259,6 +260,12 @@ public class DailyTasksPage extends AppCompatActivity {
 
 
     }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+    }
+
     private void alarmManager(){
         if(dailyMission.isEmpty()|| DailyProgressBar.getProgress()==100){
             MainActivity m = new MainActivity();
