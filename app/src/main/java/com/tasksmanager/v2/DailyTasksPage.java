@@ -25,7 +25,8 @@ public class DailyTasksPage extends AppCompatActivity {
     private Button clearAllButtonDaily;// the clear all button which removes all the missions
     private static int dailyMissionProgressPercent=0;// the current progressbar present
     private int numberDailyMisissionChecked=0;// number of marked missions
-    private static int[] bolleansDCB=new int[]{0,0,0,0,0,0,0,0};// help array for the checked boxes when 0 refers to unchecked and 1 the opposite
+    //private static int[] bolleansDCB=new int[]{0,0,0,0,0,0,0,0};// help array for the checked boxes when 0 refers to unchecked and 1 the opposite
+    private static  ArrayList<Integer> bolleansDCB =new ArrayList<>();// help array for the checked boxes when 0 refers to unchecked and 1 the opposite
     private static LinearLayout linearLayout;
         @Override
         protected void onCreate(Bundle savedInstanceState) {
@@ -42,11 +43,7 @@ public class DailyTasksPage extends AppCompatActivity {
      * save the data by calling saveAppData()
      */
     private void updateAppData(){
-        ArrayList<Integer> kkk = new ArrayList<Integer>();
-        for (int i : bolleansDCB
-        ) {
-            kkk.add(i);
-        }
+        ArrayList<Integer> kkk = (ArrayList<Integer>) bolleansDCB.clone();
         if(!MainActivity.appData.containsKey("bolleansDCB")) {
             MainActivity.appData.put("bolleansDCB", kkk);
         }
@@ -119,8 +116,8 @@ public class DailyTasksPage extends AppCompatActivity {
         linearLayout.removeAllViews();
 
         ArrayList<Integer> bb = new ArrayList<Integer>();
-        for (int i = 0; i < bolleansDCB.length ; i++) {
-            bb.add(i,bolleansDCB[i]);
+        for (int i = 0; i < bolleansDCB.size() ; i++) {
+            bb.add(i,bolleansDCB.get(i));
         }
         for (int i = 0; i <dailyMission.size(); i++) {
             CheckBox checkBox = new CheckBox(this);
@@ -130,12 +127,15 @@ public class DailyTasksPage extends AppCompatActivity {
 
             checkBox.setVisibility(View.VISIBLE);
             checkBox.setText(getDailyMission().get(i));
-            if(bb.get(i)==1){
-                checkBox.setChecked(true);
+            checkBox.setChecked(false);
+            try{
+                if(bb.get(i)==1){
+                    checkBox.setChecked(true);
+                }
+            }catch(Exception e){
+
             }
-            else {
-                checkBox.setChecked(false);
-            }
+
         }
     }
     /**
@@ -165,7 +165,7 @@ public class DailyTasksPage extends AppCompatActivity {
             checkBox.setVisibility(View.VISIBLE);
             checkBox.setText(getDailyMission().get(i));
         }
-        bolleansDCB = new int[]{0,0,0,0,0,0,0,0};
+        bolleansDCB.clear();
         DailyProgressBar.setProgress(0);
 
 
@@ -199,14 +199,23 @@ public class DailyTasksPage extends AppCompatActivity {
      * updateBooleansDCB function which update booleanDCB values based on if the checkBoxes is checked or not -> checked =1 otherwise =0
      */
     private void updateBooleansDCB() {
+        bolleansDCB.clear();
         numberDailyMisissionChecked = 0;
         for (int j=0;j<linearLayout.getChildCount();j++) {
             CheckBox c =(CheckBox) linearLayout.getChildAt(j);
+            /*if (c.isChecked() ) {
+                numberDailyMisissionChecked++;
+                bolleansDCB.set(j,1);
+            } else {
+                bolleansDCB.set(j,0);
+            }
+
+             */
             if (c.isChecked() ) {
                 numberDailyMisissionChecked++;
-                bolleansDCB[j]= 1;
+                bolleansDCB.add(j,1);
             } else {
-                bolleansDCB[j] = 0;
+                bolleansDCB.add(j,0);
             }
         }
     }
@@ -215,10 +224,10 @@ public class DailyTasksPage extends AppCompatActivity {
      */
     private void downloadDailyMissionsData() {
         if(MainActivity.appData.containsKey("bolleansDCB")||MainActivity.appData.containsKey("dailyMission")){
-            for (int i = 0; i <bolleansDCB.length ; i++) {
+            for (int i = 0; i <bolleansDCB.size() ; i++) {
                 Object d = MainActivity.appData.get("bolleansDCB").get(i);
                 Double dd=Double.parseDouble(d.toString());
-                bolleansDCB[i]= dd.intValue();
+                bolleansDCB.set(i,dd.intValue());
             }
             dailyMission=MainActivity.appData.get("dailyMission");
         }
@@ -250,6 +259,7 @@ public class DailyTasksPage extends AppCompatActivity {
         String descriptionTemp = incomingIntent.getStringExtra("eventDescription");
         if(descriptionTemp!=null){
             dailyMission.add(descriptionTemp);
+            incomingIntent.removeExtra("eventDescription");
 
         }
         updateAppData();
@@ -261,10 +271,6 @@ public class DailyTasksPage extends AppCompatActivity {
 
     }
 
-    @Override
-    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-    }
 
     private void alarmManager(){
         if(dailyMission.isEmpty()|| DailyProgressBar.getProgress()==100){

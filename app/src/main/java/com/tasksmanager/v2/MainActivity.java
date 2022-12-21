@@ -181,7 +181,7 @@ public class MainActivity extends AppCompatActivity {
                 calendar.set(Calendar.MILLISECOND,1);
 
                  //alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), 1000*60*60*24, pendingIntentDaily);
-                 alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 1000*60*3, pendingIntentDaily);
+                 //alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 1000*60*3, pendingIntentDaily);
             }
             else if(alarm==2){
 
@@ -189,7 +189,7 @@ public class MainActivity extends AppCompatActivity {
                 calendar.set(Calendar.HOUR,16 );
                 calendar.set(Calendar.MINUTE, 1);
                 calendar.set(Calendar.SECOND, 1);
-                alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), 1000*60*60*24, pendingIntentMonthly);
+                //alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), 1000*60*60*24, pendingIntentMonthly);
             }
 
 

@@ -2,6 +2,7 @@ package com.tasksmanager.v2;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -10,6 +11,8 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
@@ -23,7 +26,8 @@ public class MonthlyTasksPage extends AppCompatActivity {
     private Button clearAllButtonMonthly;// the clear all button which removes all the missions
     private static int monthlyMissionProgressPercent =0;// the current progressbar present
     private int numberMonthlyMissionChecked =0;// number of marked missions
-    private static int[] bolleansMCB =new int[]{0,0,0,0,0,0,0,0};// help array for the checked boxes when 0 refers to unchecked and 1 the opposite
+    //private static int[] bolleansMCB =new int[]{0,0,0,0,0,0,0,0};// help array for the checked boxes when 0 refers to unchecked and 1 the opposite
+    private static ArrayList<Integer> bolleansMCB =new ArrayList<>();// help array for the checked boxes when 0 refers to unchecked and 1 the opposite
     private static LinearLayout linearLayout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,11 +44,7 @@ public class MonthlyTasksPage extends AppCompatActivity {
      * save the data by calling saveAppData()
      */
     private void updateAppData(){
-        ArrayList<Integer> kkk = new ArrayList<Integer>();
-        for (int i : bolleansMCB
-        ) {
-            kkk.add(i);
-        }
+        ArrayList<Integer> kkk = (ArrayList<Integer>) bolleansMCB.clone();
         if(!MainActivity.appData.containsKey("bolleansMCB")) {
             MainActivity.appData.put("bolleansMCB", kkk);
         }
@@ -92,6 +92,9 @@ public class MonthlyTasksPage extends AppCompatActivity {
         alarmManager();
 
     }
+
+
+
     /**
      * clearAllMonthlySelectedMissions clear All button which will remove all the Missions
      * Remove all Mission by calling removeMissions("clear") with the order clear referring to the removing all missions
@@ -113,8 +116,8 @@ public class MonthlyTasksPage extends AppCompatActivity {
     private void updateCheckBoxes() {
         linearLayout.removeAllViews();
         ArrayList<Integer> bb = new ArrayList<Integer>();
-        for (int i = 0; i < bolleansMCB.length ; i++) {
-            bb.add(i, bolleansMCB[i]);
+        for (int i = 0; i < bolleansMCB.size() ; i++) {
+            bb.add(i, bolleansMCB.get(i));
         }
         for (int i = 0; i < monthlyMission.size(); i++) {
             CheckBox checkBox = new CheckBox(this);
@@ -122,11 +125,13 @@ public class MonthlyTasksPage extends AppCompatActivity {
             linearLayout.addView(checkBox);
             checkBox.setVisibility(View.VISIBLE);
             checkBox.setText(getMonthlyMission().get(i));
-            if(bb.get(i)==1){
-                checkBox.setChecked(true);
-            }
-            else {
-                checkBox.setChecked(false);
+            checkBox.setChecked(false);
+            try{
+                if(bb.get(i)==1){
+                    checkBox.setChecked(true);
+                }
+            }catch(Exception e){
+
             }
         }
     }
@@ -158,7 +163,7 @@ public class MonthlyTasksPage extends AppCompatActivity {
             checkBox.setVisibility(View.VISIBLE);
             checkBox.setText(getMonthlyMission().get(i));
         }
-        bolleansMCB = new int[]{0,0,0,0,0,0,0,0};
+        bolleansMCB.clear();
         MonthlyProgressBar.setProgress(0);
     }
     /**
@@ -191,14 +196,15 @@ public class MonthlyTasksPage extends AppCompatActivity {
      */
     private void updateBooleansDCB() {
         numberMonthlyMissionChecked = 0;
+        bolleansMCB.clear();
         for (int j = 0; j< linearLayout.getChildCount(); j++) {
 
             CheckBox c =(CheckBox) linearLayout.getChildAt(j);
-            if (c.isChecked()) {
+            if (c.isChecked() ) {
                 numberMonthlyMissionChecked++;
-                bolleansMCB[j]= 1;
+                bolleansMCB.add(j,1);
             } else {
-                bolleansMCB[j] = 0;
+                bolleansMCB.add(j,0);
             }
         }
     }
@@ -215,10 +221,10 @@ public class MonthlyTasksPage extends AppCompatActivity {
      */
     private void downloadMonthlyMissionsData() {
         if(MainActivity.appData.containsKey("bolleansMCB")||MainActivity.appData.containsKey("monthlyMission")){
-            for (int i = 0; i < bolleansMCB.length ; i++) {
+            for (int i = 0; i < bolleansMCB.size() ; i++) {
                 Object d = MainActivity.appData.get("bolleansMCB").get(i);
                 Double dd=Double.parseDouble(d.toString());
-                bolleansMCB[i]= dd.intValue();
+                bolleansMCB.set(i,dd.intValue());
             }
             monthlyMission =MainActivity.appData.get("monthlyMission");
         }
@@ -245,7 +251,10 @@ public class MonthlyTasksPage extends AppCompatActivity {
         String descriptionTemp = incomingIntent.getStringExtra("eventDescription");
         if(descriptionTemp!=null){
             monthlyMission.add(descriptionTemp);
+            incomingIntent.removeExtra("eventDescription");
+
         }
+
         updateAppData();
         updateButtonsVisibility();
         updateProgressBar();

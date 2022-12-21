@@ -51,13 +51,7 @@ public class DailyTasksInsert extends AppCompatActivity {
 
         }
     }
-    public Boolean removeEmptyRows(String[] lines){
-        if (lines[lines.length].contains("[a-zA-Z]+") | lines[lines.length].contains("[0-9]+")){
-            return true;
-        }
-        lines[lines.length]=null;
-        return false;
-    }
+
 
     /**
      * saveDailyMission Save button Function which save the event
