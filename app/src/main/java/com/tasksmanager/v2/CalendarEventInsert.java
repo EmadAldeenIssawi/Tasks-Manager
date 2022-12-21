@@ -20,8 +20,6 @@ public class CalendarEventInsert extends AppCompatActivity {
     private TextView  eventDate; //the textView that shows the selected date
     private TextView  eventTime; //the textView that show the selected time
     private TimePicker  timePicker; // the time Picker that the user use to select time
-    public static HashMap<LocalDate, ArrayList<Event>>  eventsOnDate=new HashMap<>(); //hash table that has arraylists which has event and  each arraylist has date as key
-    public static HashMap<Month, ArrayList<Integer>> monthlyEventsDaysTextViews=new HashMap<>(); // hashtable that has array lists that has numbers which represents dates that has events and  every array list has Month as a key
     private LocalDate date; // selected date
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,9 +125,9 @@ public class CalendarEventInsert extends AppCompatActivity {
      * @param e the created event to be added
      */
     private void addEvent(Event e){
-        if (eventsOnDate.containsKey(date)) {
-            eventsOnDate.get(date).add(e);
-            eventsOnDate.get(date).sort(new Comparator<Event>() {
+        if (Calendar.eventsOnDate.containsKey(date)) {
+            Calendar.eventsOnDate.get(date).add(e);
+            Calendar.eventsOnDate.get(date).sort(new Comparator<Event>() {
                 @Override
                 public int compare(Event event1, Event event2) {
                     if(event1.time.isAfter(event2.time)) return 1;
@@ -140,7 +138,7 @@ public class CalendarEventInsert extends AppCompatActivity {
         } else {
             ArrayList<Event> events = new ArrayList<>();
             events.add(e);
-            eventsOnDate.put(date, events);
+            Calendar.eventsOnDate.put(date, events);
         }
     }
 
@@ -150,18 +148,18 @@ public class CalendarEventInsert extends AppCompatActivity {
      * if the hashTable monthlyEventsDaysTextViews  does not contain the key selected month create an arrayList with type of Int and add the selected day to it and then put it in the hash table monthlyEventsDaysTextViews with the selected month as a key
      */
     private void addDayNum(){
-        if (monthlyEventsDaysTextViews.containsKey(date.getMonth())) {
+        if (Calendar.monthlyEventsDaysTextViews.containsKey(date.getMonth())) {
             int tempDay = date.getDayOfMonth();
-            if (!monthlyEventsDaysTextViews.get(date.getMonth()).contains(tempDay)) {
-                monthlyEventsDaysTextViews.get(date.getMonth()).add(date.getDayOfMonth());
-                Collections.sort(monthlyEventsDaysTextViews.get(date.getMonth()));
+            if (!Calendar.monthlyEventsDaysTextViews.get(date.getMonth()).contains(tempDay)) {
+                Calendar.monthlyEventsDaysTextViews.get(date.getMonth()).add(date.getDayOfMonth());
+                Collections.sort(Calendar.monthlyEventsDaysTextViews.get(date.getMonth()));
             }
 
 
         } else {
             ArrayList<Integer> days = new ArrayList<>();
             days.add(date.getDayOfMonth());
-            monthlyEventsDaysTextViews.put(date.getMonth(),days);
+            Calendar.monthlyEventsDaysTextViews.put(date.getMonth(),days);
         }
     }
 

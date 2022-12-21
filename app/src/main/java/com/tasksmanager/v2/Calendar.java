@@ -49,21 +49,23 @@ import java.util.Map;
 
 public class Calendar extends AppCompatActivity {
     private CalendarView calendarview; // the calendar that the user use
-    private  Month  selectedMonth; //the current selected month by the user
+    private Month  selectedMonth; //the current selected month by the user
     private LocalDateTime datee; // current local time
     private CalendarEventInsert calendarEventInsert; // call for the CalendarEventsInsert class
-    private ArrayList<Integer> checkVariables= new ArrayList<>(Arrays.asList(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
+    private final ArrayList<Integer> checkVariables= new ArrayList<>(Arrays.asList(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
     private ArrayList<Integer> helpCheckVariables=  new ArrayList<>(Arrays.asList(0,0,0,0,0,0,0,0,0,0,0,0));
     private int selectClick = 0 ;// help variable used in edit button function
     private Boolean restored=false; // help variable knowing that the screen is rotated and the restore function activated
-    private  static LocalDate selectedDate;////the current selected date by the user
-    public LocalDate getSelectedDate() {
+    private static LocalDate selectedDate;////the current selected date by the user
+    public  LocalDate getSelectedDate() {
         return selectedDate;
     }
     private Boolean thereCheckBoxChecked=false;
     private TextView eventsTextView,daysTextView;
-    private  LinearLayout linearLayout2;//thescroll view that contains events description
-    private  LinearLayout linearLayoutEventsDays; // the table layout that contains the date that contains events
+    private LinearLayout linearLayout2;//thescroll view that contains events description
+    private LinearLayout linearLayoutEventsDays; // the table layout that contains the date that contains events
+    public static HashMap<LocalDate, ArrayList<Event>>  eventsOnDate=new HashMap<>(); //hash table that has arraylists which has event and  each arraylist has date as key
+    public static HashMap<Month, ArrayList<Integer>> monthlyEventsDaysTextViews=new HashMap<>(); // hashtable that has array lists that has numbers which represents dates that has events and  every array list has Month as a key
 
 
 
@@ -98,7 +100,7 @@ public class Calendar extends AppCompatActivity {
                 selectedDate=date;
                 selectedMonth=date.getMonth();
                 showEvents( );
-                if(calendarEventInsert.monthlyEventsDaysTextViews.containsKey(selectedDate.getMonth())){
+                if(monthlyEventsDaysTextViews.containsKey(selectedDate.getMonth())){
                     updateEventsDaysColor();
                 }
                 else {
@@ -146,7 +148,7 @@ public class Calendar extends AppCompatActivity {
      * set an onCheck listener for each checkbox in the events tablelayout which will change visibility for Remove button based on if there any check box is checked or not
      */
     private void initializeComponents() {
-        calendarview = (CalendarView) findViewById(R.id.calendarView2);
+        calendarview = findViewById(R.id.calendarView2);
         eventsTextView=findViewById(R.id.eventTextView);
         daysTextView=findViewById(R.id.daysTextView);
         linearLayout2=(LinearLayout) ((ScrollView) findViewById(R.id.eventsScrollView)).getChildAt(0);
@@ -174,10 +176,10 @@ public class Calendar extends AppCompatActivity {
      */
     private void showEvents() {
         emptyEvents();
-        if (calendarEventInsert.eventsOnDate.containsKey(selectedDate)) {
+        if (eventsOnDate.containsKey(selectedDate)) {
             String s = "";
             int ind=0;
-            for (Event e : calendarEventInsert.eventsOnDate.get(selectedDate)
+            for (Event e : eventsOnDate.get(selectedDate)
             ) {
                 TableRow row = new TableRow(this);
 
@@ -219,13 +221,13 @@ public class Calendar extends AppCompatActivity {
      */
     private void updateEventsDaysColor() {
         emptyEventsDates();
-        for (int i=0; i<calendarEventInsert.monthlyEventsDaysTextViews.get(selectedDate.getMonth()).size();i++) {
+        for (int i = 0; i< monthlyEventsDaysTextViews.get(selectedDate.getMonth()).size(); i++) {
             TextView textView = new TextView(this);
             linearLayoutEventsDays.addView(textView,i);
 
-                textView.setText(Integer.toString(calendarEventInsert.monthlyEventsDaysTextViews.get(selectedDate.getMonth()).get(i)));
+                textView.setText(Integer.toString(monthlyEventsDaysTextViews.get(selectedDate.getMonth()).get(i)));
 
-                if(Integer.parseInt(String.valueOf(datee.getDayOfMonth()))>calendarEventInsert.monthlyEventsDaysTextViews.get(selectedDate.getMonth()).get(i)){
+                if(Integer.parseInt(String.valueOf(datee.getDayOfMonth()))> monthlyEventsDaysTextViews.get(selectedDate.getMonth()).get(i)){
                     textView.setTextColor(Color.DKGRAY);
                 } else {
                     textView.setTextColor(Color.BLUE);
@@ -242,10 +244,10 @@ public class Calendar extends AppCompatActivity {
      * if the selected month has no day that has event in it so change visibility for Clear all button, Remove All button and Edit button to Invisible
      */
     private void updateButtonsVisibility() {
-        if(calendarEventInsert.monthlyEventsDaysTextViews.get(selectedMonth)!=null) {
+        if(monthlyEventsDaysTextViews.get(selectedMonth)!=null) {
             findViewById(R.id.clearAll).setVisibility(View.VISIBLE);
             daysTextView.setVisibility(View.VISIBLE);
-            if (calendarEventInsert.eventsOnDate.get(selectedDate) != null) {
+            if (eventsOnDate.get(selectedDate) != null) {
                 findViewById(R.id.selectEvents).setVisibility(View.VISIBLE);
                 findViewById(R.id.RemoveAllEvents).setVisibility(View.VISIBLE);
                 eventsTextView.setVisibility(View.VISIBLE);
@@ -308,7 +310,7 @@ public class Calendar extends AppCompatActivity {
      * @param view Select Button
      */
     public void selectEvents(View view) {
-        if(calendarEventInsert.eventsOnDate.get(selectedDate).size()==0){
+        if(eventsOnDate.get(selectedDate).size()==0){
             Toast.makeText(this,"No events to edit",Toast.LENGTH_LONG).show();
         } else {
             if (selectClick == 0) {
@@ -385,12 +387,11 @@ public class Calendar extends AppCompatActivity {
      *@param v Remove all button
      */
     public void removeAllEvents(View v) {
-        if(calendarEventInsert.eventsOnDate.get(selectedDate)!=null) {
-            calendarEventInsert.eventsOnDate.remove(selectedDate);
+        if(eventsOnDate.get(selectedDate)!=null) {
+            eventsOnDate.remove(selectedDate);
         }
         showEvents();
-        int day=  calendarEventInsert.monthlyEventsDaysTextViews.get(selectedDate.getMonth()).indexOf(selectedDate.getDayOfMonth());
-        calendarEventInsert.monthlyEventsDaysTextViews.get(selectedDate.getMonth()).remove(day);
+        monthlyEventsDaysTextViews.get(selectedDate.getMonth()).remove((Integer) selectedDate.getDayOfMonth());
 
 
         emptyEventsDates();
@@ -432,9 +433,9 @@ public class Calendar extends AppCompatActivity {
             TextView t = (TextView) r.getChildAt(1);
             if (c.isChecked() && t.getText()!="") numChecked++;
         }
-        if (((calendarEventInsert.eventsOnDate.get(selectedDate).size()==1)&&(numChecked!=0)) || numChecked ==calendarEventInsert.eventsOnDate.get(selectedDate).size()) {
+        if (((eventsOnDate.get(selectedDate).size()==1)&&(numChecked!=0)) || numChecked == eventsOnDate.get(selectedDate).size()) {
             View vn = null;
-            if (calendarEventInsert.monthlyEventsDaysTextViews.get(selectedMonth).size()==1
+            if (monthlyEventsDaysTextViews.get(selectedMonth).size()==1
             ) {
                 clearAllEvents(vn);
             } else {
@@ -447,7 +448,7 @@ public class Calendar extends AppCompatActivity {
                 TextView t = (TextView) r.getChildAt(1);
                 if (c.isChecked() && t.getText()!="") {
                     int ii=i;
-                    calendarEventInsert.eventsOnDate.get(selectedDate).remove(ii);
+                    eventsOnDate.get(selectedDate).remove(ii);
                     linearLayout2.removeViewAt(i);
                 }
             }
@@ -472,16 +473,16 @@ public class Calendar extends AppCompatActivity {
      * @param view clear all events button
      */
     public void clearAllEvents(View view) {
-        if (calendarEventInsert.monthlyEventsDaysTextViews.get(selectedMonth)!=null) {
-            for (int dayInt : calendarEventInsert.monthlyEventsDaysTextViews.get(selectedMonth)
+        if (monthlyEventsDaysTextViews.get(selectedMonth)!=null) {
+            for (int dayInt : monthlyEventsDaysTextViews.get(selectedMonth)
             ) {
                 LocalDate d = LocalDate.of(selectedDate.getYear(), selectedMonth, dayInt);
 
-                if (calendarEventInsert.eventsOnDate.get(d) != null) {
-                    calendarEventInsert.eventsOnDate.remove(d);
+                if (eventsOnDate.get(d) != null) {
+                    eventsOnDate.remove(d);
                 }
             }
-            calendarEventInsert.monthlyEventsDaysTextViews.remove(selectedMonth);
+            monthlyEventsDaysTextViews.remove(selectedMonth);
         }
         emptyEventsDates();
         emptyEvents();
@@ -524,10 +525,10 @@ public class Calendar extends AppCompatActivity {
 
                 arrayList1.add(s);
             }
-            if (calendarEventInsert.monthlyEventsDaysTextViews.containsKey(month)) {
-                Collections.copy(calendarEventInsert.monthlyEventsDaysTextViews.get(month), arrayList1);
+            if (monthlyEventsDaysTextViews.containsKey(month)) {
+                Collections.copy(monthlyEventsDaysTextViews.get(month), arrayList1);
             } else {
-                calendarEventInsert.monthlyEventsDaysTextViews.put(month, arrayList1);
+                monthlyEventsDaysTextViews.put(month, arrayList1);
             }
         }
     }
@@ -545,12 +546,12 @@ public class Calendar extends AppCompatActivity {
         e.date = LocalDate.parse(ds);
         String ts = String.valueOf(ll.get("time"));
         e.time = LocalTime.parse(ts);
-        if (calendarEventInsert.eventsOnDate.containsKey(e.date)) {
-            calendarEventInsert.eventsOnDate.get(e.date).add(e);
+        if (eventsOnDate.containsKey(e.date)) {
+            eventsOnDate.get(e.date).add(e);
         } else {
             ArrayList<Event> ev = new ArrayList<>();
             ev.add(e);
-            calendarEventInsert.eventsOnDate.put(e.date, ev);
+            eventsOnDate.put(e.date, ev);
         }
     }
 
@@ -563,7 +564,7 @@ public class Calendar extends AppCompatActivity {
      * set the map in monthlyEventsDaysTextViews hashmap using downloadMonthlyEventsDaysTextViews(map)
      */
     private void downloadAllData() {
-        if (MainActivity.appData.containsKey("eventsOnDateEvents") && calendarEventInsert.eventsOnDate.isEmpty()&&MainActivity.appData.get("eventsOnDateEvents") != null) {
+        if (MainActivity.appData.containsKey("eventsOnDateEvents") && eventsOnDate.isEmpty()&&MainActivity.appData.get("eventsOnDateEvents") != null) {
 
             for (int i = 0; i < MainActivity.appData.get("eventsOnDateEvents").size(); i++) {
                 try {
@@ -577,7 +578,7 @@ public class Calendar extends AppCompatActivity {
             }
 
         }
-        if (MainActivity.appData.containsKey("monthlyEventsDaysTextViews") && calendarEventInsert.monthlyEventsDaysTextViews.isEmpty()&&MainActivity.appData.get("monthlyEventsDaysTextViews") != null) {
+        if (MainActivity.appData.containsKey("monthlyEventsDaysTextViews") && monthlyEventsDaysTextViews.isEmpty()&&MainActivity.appData.get("monthlyEventsDaysTextViews") != null) {
 
             try {
                 LinkedTreeMap a = (LinkedTreeMap) MainActivity.appData.get("monthlyEventsDaysTextViews").get(0);
@@ -598,16 +599,16 @@ public class Calendar extends AppCompatActivity {
      */
     private void uploadAppData() {
         ArrayList<Event> events =new ArrayList<>();
-        for (LocalDate d :calendarEventInsert.eventsOnDate.keySet()) {///////////////////////////**************************
-            for (int i = 0; i <calendarEventInsert.eventsOnDate.get(d).size() ; i++) {
-                events.add(calendarEventInsert.eventsOnDate.get(d).get(i));
+        for (LocalDate d : eventsOnDate.keySet()) {///////////////////////////**************************
+            for (int i = 0; i < eventsOnDate.get(d).size() ; i++) {
+                events.add(eventsOnDate.get(d).get(i));
             }
         }
         if(!MainActivity.appData.containsKey("eventsOnDateEvents"))
             MainActivity.appData.put("eventsOnDateEvents",events);
         else MainActivity.appData.replace("eventsOnDateEvents",events);
         ArrayList<HashMap<Month,ArrayList<Integer>>> a = new ArrayList<>();
-        a.add(calendarEventInsert.monthlyEventsDaysTextViews);
+        a.add(monthlyEventsDaysTextViews);
         if(!MainActivity.appData.containsKey("monthlyEventsDaysTextViews"))MainActivity.appData.put("monthlyEventsDaysTextViews",a) ;
         else MainActivity.appData.replace("monthlyEventsDaysTextViews",a);
 
@@ -630,10 +631,10 @@ public class Calendar extends AppCompatActivity {
         uploadAppData();
         updateButtonsVisibility();
         showEvents();
-        if (calendarEventInsert.monthlyEventsDaysTextViews.containsKey(selectedDate.getMonth())) {
+        if (monthlyEventsDaysTextViews.containsKey(selectedDate.getMonth())) {
             updateEventsDaysColor();
         } else {
-            if (calendarEventInsert.monthlyEventsDaysTextViews.get(selectedDate.getMonth())!= null) {
+            if (monthlyEventsDaysTextViews.get(selectedDate.getMonth())!= null) {
                 emptyEventsDates();
             }
         }
