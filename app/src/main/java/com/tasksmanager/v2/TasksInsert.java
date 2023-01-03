@@ -1,6 +1,5 @@
 package com.tasksmanager.v2;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -10,14 +9,11 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.util.Arrays;
-
-public class DailyTasksInsert extends AppCompatActivity {
+public class TasksInsert extends AppCompatActivity {
 
     private EditText editText;
     private String des="";
     private String incomigIntent="";
-    Intent incomingIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +48,13 @@ public class DailyTasksInsert extends AppCompatActivity {
         }
     }
 
-
+    /**
+     * set the input to the global description
+     * @param des event description
+     */
+    private void setDes(String des) {
+        this.des = des;
+    }
     /**
      * saveDailyMission Save button Function which save the event
      * Toast "Max 8 Mission" if the user would insert more than 8 missions and finish the function
@@ -66,38 +68,18 @@ public class DailyTasksInsert extends AppCompatActivity {
             Toast.makeText(this,"Enter a mission",Toast.LENGTH_LONG).show();
         }
         else{
-            des =String.valueOf(editText.getText());
-            des = des.replace("\n", "");
-            //String[] lines = text.split("\\n");
-            //removeEmptyRows(lines);
-            //String des= Arrays.toString(lines);
-
+            des =String.valueOf(editText.getText()).replace("\n", "");
             setDes(des);
-            if(incomigIntent.equals("DailyTasksPage")){
-                Intent i= new Intent(this,DailyTasksPage.class);
-                i.putExtra("eventDescription",des);
-                startActivity(i);
-            }else if(incomigIntent.equals("MonthlyTasksPage")){
-                Intent i = new Intent(this,MonthlyTasksPage.class);
-                i.putExtra("eventDescription",des);
-                startActivity(i);
-
-
-            }
-
-           // Intent cE2 = new Intent(this,MonthlyTasksPage.class);
-
-            //cE2.putExtra("eventDescription",des);
-
-            //DailyTasksPage.getDailyMission().add(des);
-
-
+            Intent i=null;
+            if(incomigIntent.equals("DailyTasksPage")) i= new Intent(this,DailyTasksPage.class);
+                else if(incomigIntent.equals("MonthlyTasksPage")) i = new Intent(this,MonthlyTasksPage.class);
+            assert i != null;
+            i.putExtra("eventDescription",des);
+            startActivity(i);
         }
 
     }
 
-    public void setDes(String des) {
-        this.des = des;
-    }
+
 
 }

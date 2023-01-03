@@ -12,14 +12,12 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.Month;
 import java.util.*;
 
 public class CalendarEventInsert extends AppCompatActivity {
     private EditText  eventDescription;//the edit text that the user write the event description in it
     private TextView  eventDate; //the textView that shows the selected date
     private TextView  eventTime; //the textView that show the selected time
-    private TimePicker  timePicker; // the time Picker that the user use to select time
     private LocalDate date; // selected date
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,18 +26,19 @@ public class CalendarEventInsert extends AppCompatActivity {
 
         // initialize the component and get the date from the coming intent  and put it in the eventDate textView and set the timePicker
         intiWidget();
-        Intent incomingIntent = getIntent();
-        timePicker = findViewById(R.id.timePicker);
+        // the time Picker that the user use to select time
+        TimePicker timePicker = findViewById(R.id.timePicker);
         timePicker.setIs24HourView(true);
-        eventDate.setText(incomingIntent.getStringExtra("date"));
+        eventDate.setText(getIntent().getStringExtra("date"));
         // set the date variable to the selected date and set onTimeChange Listener which will view the picked time on the timeTextView
         Calendar c = new Calendar();
         date= c.getSelectedDate();
 
         timePicker.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
+            @SuppressLint("SetTextI18n")
             @Override
             public void onTimeChanged(TimePicker timePicker, int i, int i1) {
-                eventTime.setText(String.valueOf(timePicker.getHour())+":"+String.valueOf(timePicker.getMinute()));
+                eventTime.setText(timePicker.getHour() +":"+ timePicker.getMinute());
             }
         });
     }
@@ -54,7 +53,6 @@ public class CalendarEventInsert extends AppCompatActivity {
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         if(eventTime.getText()!= "" ) {
-
             outState.putString("time", (String) eventTime.getText());
         }
     }
@@ -99,7 +97,7 @@ public class CalendarEventInsert extends AppCompatActivity {
         int sub= s.indexOf(":");
         if (!s.isEmpty()) {
             h = s.substring(0, sub);
-            m = s.substring(sub + 1, s.length());
+            m = s.substring(sub + 1);
             if (eventDs.isEmpty()) {
                 Toast.makeText(this, "Enter an event description", Toast.LENGTH_LONG).show();
             } else {
@@ -148,20 +146,17 @@ public class CalendarEventInsert extends AppCompatActivity {
      * if the hashTable monthlyEventsDaysTextViews  does not contain the key selected month create an arrayList with type of Int and add the selected day to it and then put it in the hash table monthlyEventsDaysTextViews with the selected month as a key
      */
     private void addDayNum(){
-        if (Calendar.monthlyEventsDaysTextViews.containsKey(date.getMonth())) {
+        if (Calendar.datesWithEventsOnMonth.containsKey(date.getMonth())) {
             int tempDay = date.getDayOfMonth();
-            if (!Calendar.monthlyEventsDaysTextViews.get(date.getMonth()).contains(tempDay)) {
-                Calendar.monthlyEventsDaysTextViews.get(date.getMonth()).add(date.getDayOfMonth());
-                Collections.sort(Calendar.monthlyEventsDaysTextViews.get(date.getMonth()));
+            if (!Calendar.datesWithEventsOnMonth.get(date.getMonth()).contains(tempDay)) {
+                Calendar.datesWithEventsOnMonth.get(date.getMonth()).add(date.getDayOfMonth());
+                Collections.sort(Calendar.datesWithEventsOnMonth.get(date.getMonth()));
             }
-
-
         } else {
             ArrayList<Integer> days = new ArrayList<>();
             days.add(date.getDayOfMonth());
-            Calendar.monthlyEventsDaysTextViews.put(date.getMonth(),days);
+            Calendar.datesWithEventsOnMonth.put(date.getMonth(),days);
         }
     }
-
 
 }

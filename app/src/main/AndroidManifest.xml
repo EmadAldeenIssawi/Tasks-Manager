@@ -30,7 +30,7 @@
 
             />
         <activity
-            android:name=".DailyTasksInsert"
+            android:name=".TasksInsert"
             android:exported="false"
             android:theme="@style/HiddenTitleTheme"
 

@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="#C3C6C8"
     android:backgroundTint="#646667"
-    tools:context=".DailyTasksInsert">
+    tools:context=".TasksInsert">
     <EditText
         android:id="@+id/DailyMissionDes"
         android:layout_width="604dp"

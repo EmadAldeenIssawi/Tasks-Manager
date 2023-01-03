@@ -169,6 +169,7 @@
 
     <ScrollView
         android:id="@+id/eventsScrollView"
+        style="@android:style/Widget.Holo.ScrollView"
         android:layout_width="228dp"
         android:layout_height="190dp"
         android:layout_marginBottom="72dp"

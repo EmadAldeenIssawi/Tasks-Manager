@@ -1,8 +1,8 @@
 package com.tasksmanager.v2;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -11,24 +11,21 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class MonthlyTasksPage extends AppCompatActivity {
 
 
-    private static ArrayList<String> monthlyMission = new ArrayList<>();//the arraylist that has missions
-    private ProgressBar MonthlyProgressBar;// the progress bar that view how much did the user process of all the missions
+    private static ArrayList monthlyMission = new ArrayList<>();//the arraylist that has missions
+    private ProgressBar monthlyProgressBar;// the progress bar that view how much did the user process of all the missions
     private Button removeButtonMonthly;// the remove trash button which removes the selected missions
     private Button clearAllButtonMonthly;// the clear all button which removes all the missions
-    private static int monthlyMissionProgressPercent =0;// the current progressbar present
     private int numberMonthlyMissionChecked =0;// number of marked missions
-    //private static int[] bolleansMCB =new int[]{0,0,0,0,0,0,0,0};// help array for the checked boxes when 0 refers to unchecked and 1 the opposite
-    private static ArrayList<Integer> bolleansMCB =new ArrayList<>();// help array for the checked boxes when 0 refers to unchecked and 1 the opposite
-    private static LinearLayout linearLayout;
+    private static final ArrayList<Integer> booleanMCB =new ArrayList<>();// help array for the checked boxes when 0 refers to unchecked and 1 the opposite
+    private  LinearLayout linearLayout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,22 +37,19 @@ public class MonthlyTasksPage extends AppCompatActivity {
 
     }
     /**
-     * upload the activity data booleanDCB and monthlyMission to thr main map appData
+     * upload the activity data booleanMCB and monthlyMission to thr main map appData
      * save the data by calling saveAppData()
      */
     private void updateAppData(){
-        ArrayList<Integer> kkk = (ArrayList<Integer>) bolleansMCB.clone();
-        if(!MainActivity.appData.containsKey("bolleansMCB")) {
-            MainActivity.appData.put("bolleansMCB", kkk);
+        ArrayList<Integer> kkk = (ArrayList<Integer>) booleanMCB.clone();
+        if(!MainActivity.appData.containsKey("booleanMCB")) {
+            MainActivity.appData.put("booleanMCB", kkk);
+        } else{
+            MainActivity.appData.replace("booleanMCB",kkk);
         }
-        else{
-            MainActivity.appData.replace("bolleansMCB",kkk);
-
-        }
-        if(!MainActivity.appData.containsKey("monthlyDission")) {
+        if(!MainActivity.appData.containsKey("monthlyMission")) {
             MainActivity.appData.put("monthlyMission", monthlyMission);
-        }
-        else{
+        } else{
             MainActivity.appData.replace("monthlyMission", monthlyMission);
         }
         MainActivity m = new MainActivity();
@@ -65,17 +59,17 @@ public class MonthlyTasksPage extends AppCompatActivity {
      * initializeComponent which initialize the component and set the progressBar to the max value
      * set the onCheckListener for the checkBoxes and call monthlyMissionCheck() for every check
      */
+    @SuppressLint("CutPasteId")
     private void initializeComponent() {
-        MonthlyProgressBar = findViewById(R.id.MonthlyProgressBar);
+        monthlyProgressBar = findViewById(R.id.MonthlyProgressBar);
         removeButtonMonthly =findViewById(R.id.removeMonthlyMissions);
         clearAllButtonMonthly =findViewById(R.id.clearAllMonthlyButton);
-        MonthlyProgressBar.setMax(100);
         linearLayout=(LinearLayout) ((ScrollView) findViewById(R.id.monthlyTasksScrollview)).getChildAt(0);
+        monthlyProgressBar.setMax(100);
 
         for (int i = 0; i < linearLayout.getChildCount() ; i++) {
-
             CheckBox c =(CheckBox) linearLayout.getChildAt(i);
-            c.setOnCheckedChangeListener(new MonthlyTasksPage.MonthlyMissionCheck());
+            c.setOnCheckedChangeListener(new MonthlyMissionCheck());
         }
     }
     /**
@@ -116,8 +110,8 @@ public class MonthlyTasksPage extends AppCompatActivity {
     private void updateCheckBoxes() {
         linearLayout.removeAllViews();
         ArrayList<Integer> bb = new ArrayList<Integer>();
-        for (int i = 0; i < bolleansMCB.size() ; i++) {
-            bb.add(i, bolleansMCB.get(i));
+        for (int i = 0; i < booleanMCB.size() ; i++) {
+            bb.add(i, booleanMCB.get(i));
         }
         for (int i = 0; i < monthlyMission.size(); i++) {
             CheckBox checkBox = new CheckBox(this);
@@ -127,12 +121,8 @@ public class MonthlyTasksPage extends AppCompatActivity {
             checkBox.setText(getMonthlyMission().get(i));
             checkBox.setChecked(false);
             try{
-                if(bb.get(i)==1){
-                    checkBox.setChecked(true);
-                }
-            }catch(Exception e){
-
-            }
+                if(bb.get(i)==1) checkBox.setChecked(true);
+            }catch(Exception ignored){}
         }
     }
     /**
@@ -141,17 +131,14 @@ public class MonthlyTasksPage extends AppCompatActivity {
      * if the order is clear so remove the text anyway
      * set the checkBox visibility and check status to false a and the empty the text
      * set the rest of the monthlyMission missions in the checkBoxes and make the Visible
-     * reset the booleanDCB values to zeros referring that the select process is done
+     * reset the booleanMCB values to zeros referring that the select process is done
      * make the progressbar zero
      * @param doFun: String the order as a String
      */
     private void removeMissions(String doFun) {
         for (int j = 0; j< linearLayout.getChildCount(); j++) {
-
             CheckBox c =(CheckBox) linearLayout.getChildAt(j);
-            if (c.isChecked() && doFun == "remove") {
-                monthlyMission.remove(c.getText().toString());
-            } else if (doFun == "clear") {
+            if ((c.isChecked() && Objects.equals(doFun, "remove")) ||( Objects.equals(doFun, "clear"))) {
                 monthlyMission.remove(c.getText().toString());
             }
             c.setVisibility(View.INVISIBLE);
@@ -159,24 +146,23 @@ public class MonthlyTasksPage extends AppCompatActivity {
             c.setText("");
         }
         for (int i = 0; i< monthlyMission.size(); i++ ) {
-            CheckBox checkBox =(CheckBox) linearLayout.getChildAt(0) ;
+            CheckBox checkBox =(CheckBox) linearLayout.getChildAt(i) ;
             checkBox.setVisibility(View.VISIBLE);
             checkBox.setText(getMonthlyMission().get(i));
         }
-        bolleansMCB.clear();
-        MonthlyProgressBar.setProgress(0);
+        booleanMCB.clear();
+        monthlyProgressBar.setProgress(0);
     }
     /**
      * updateProgressBar function which update the progressBar based on the how many mission are checked off all mission and make it as percentage
      */
     private void updateProgressBar() {
         if(monthlyMission.size()>0) {
-            double x =(double) ((double) numberMonthlyMissionChecked / (double) monthlyMission.size()) * 100;
-            monthlyMissionProgressPercent =(int) x;
-            MonthlyProgressBar.setProgress(monthlyMissionProgressPercent);
+            double monthlyMissionProgressPercent =(double) ((double) numberMonthlyMissionChecked / (double) monthlyMission.size()) * 100;
+            monthlyProgressBar.setProgress((int)monthlyMissionProgressPercent);
         }
         else{
-            MonthlyProgressBar.setProgress(0);
+            monthlyProgressBar.setProgress(0);
         }
     }
     /**
@@ -192,47 +178,38 @@ public class MonthlyTasksPage extends AppCompatActivity {
         }
     }
     /**
-     * updateBooleansDCB function which update booleanDCB values based on if the checkBoxes is checked or not -> checked =1 otherwise =0
+     * updateBooleansMCB function which update booleanMCB values based on if the checkBoxes is checked or not -> checked =1 otherwise =0
      */
-    private void updateBooleansDCB() {
+    private void updateBooleansMCB() {
+        booleanMCB.clear();
         numberMonthlyMissionChecked = 0;
-        bolleansMCB.clear();
         for (int j = 0; j< linearLayout.getChildCount(); j++) {
-
             CheckBox c =(CheckBox) linearLayout.getChildAt(j);
             if (c.isChecked() ) {
                 numberMonthlyMissionChecked++;
-                bolleansMCB.add(j,1);
+                booleanMCB.add(j,1);
             } else {
-                bolleansMCB.add(j,0);
+                booleanMCB.add(j,0);
             }
         }
     }
 
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        Intent i = new Intent(this,MainActivity.class);
-        startActivity(i);
-    }
+
 
     /**
-     * downloadMonthlyMissionsData function which download the data from the main appData map for this activity and set it into the activity variables booleanDCB,monthlyMission
+     * downloadMonthlyMissionsData function which download the data from the main appData map for this activity and set it into the activity variables booleanMCB,monthlyMission
      */
     private void downloadMonthlyMissionsData() {
-        if(MainActivity.appData.containsKey("bolleansMCB")||MainActivity.appData.containsKey("monthlyMission")){
-            for (int i = 0; i < bolleansMCB.size() ; i++) {
-                Object d = MainActivity.appData.get("bolleansMCB").get(i);
-                Double dd=Double.parseDouble(d.toString());
-                bolleansMCB.set(i,dd.intValue());
+        if(MainActivity.appData.containsKey("booleanMCB")||MainActivity.appData.containsKey("monthlyMission")){
+            for (int i = 0; i < booleanMCB.size() ; i++) {
+                Object d = Objects.requireNonNull(MainActivity.appData.get("booleanMCB")).get(i);
+                double dd=Double.parseDouble(d.toString());
+                booleanMCB.set(i, (int) dd);
             }
             monthlyMission =MainActivity.appData.get("monthlyMission");
         }
     }
 
-    public  ArrayList<String>  getMonthlyMissionsArrayList(){
-        return monthlyMission;
-    }
 
 
     /**
@@ -240,8 +217,14 @@ public class MonthlyTasksPage extends AppCompatActivity {
      * @param v: View Add Mission button
      */
     public void monthlyMissionPageInsertGo(View v){
-        Intent i = new Intent(this,DailyTasksInsert.class);
+        Intent i = new Intent(this, TasksInsert.class);
         i.putExtra("sender","MonthlyTasksPage");
+        startActivity(i);
+    }
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent i = new Intent(this,MainActivity.class);
         startActivity(i);
     }
     @Override
@@ -254,7 +237,6 @@ public class MonthlyTasksPage extends AppCompatActivity {
             incomingIntent.removeExtra("eventDescription");
 
         }
-
         updateAppData();
         updateButtonsVisibility();
         updateProgressBar();
@@ -264,11 +246,11 @@ public class MonthlyTasksPage extends AppCompatActivity {
 
     }
     private void alarmManager(){
-        if(monthlyMission.isEmpty()|| MonthlyProgressBar.getProgress()==100){
+        if(monthlyMission.isEmpty()|| monthlyProgressBar.getProgress()==100){
             MainActivity m = new MainActivity();
             m.stopAlarmManager(MainActivity.alarmManagerMonthly,1);
         }
-        else if(!monthlyMission.isEmpty() && MonthlyProgressBar.getProgress()!=100){
+        else if(!monthlyMission.isEmpty() && monthlyProgressBar.getProgress()!=100){
             MainActivity m = new MainActivity();
             m.resumeAlarmManager(MainActivity.alarmManagerMonthly,1);
         }
@@ -280,13 +262,13 @@ public class MonthlyTasksPage extends AppCompatActivity {
     class MonthlyMissionCheck implements CompoundButton.OnCheckedChangeListener{
         /**
          * monthlyMissionCheck function which will work for every time the user check any mission
-         * update the values in booleanDCB
+         * update the values in booleanMCB
          * update the progressBar
          * upload the current data
          */
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            updateBooleansDCB();
+            updateBooleansMCB();
             updateProgressBar();
             updateAppData();
             alarmManager();

@@ -11,23 +11,21 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 
 public class DailyTasksPage extends AppCompatActivity {
 
-    private static ArrayList<String> dailyMission= new ArrayList<>();//the arraylist that has missions
-    private ProgressBar DailyProgressBar;// the progress bar that view how much did the user process of all the missions
+    private static ArrayList dailyMission= new ArrayList<>();//the arraylist that has missions
+    private ProgressBar dailyProgressBar;// the progress bar that view how much did the user process of all the missions
     private Button removeButtonDaily;// the remove trash button which removes the selected missions
     private Button clearAllButtonDaily;// the clear all button which removes all the missions
-    private static int dailyMissionProgressPercent=0;// the current progressbar present
-    private int numberDailyMisissionChecked=0;// number of marked missions
-    //private static int[] bolleansDCB=new int[]{0,0,0,0,0,0,0,0};// help array for the checked boxes when 0 refers to unchecked and 1 the opposite
-    private static  ArrayList<Integer> bolleansDCB =new ArrayList<>();// help array for the checked boxes when 0 refers to unchecked and 1 the opposite
-    private static LinearLayout linearLayout;
+    private int numberDailyMissionChecked =0;// number of marked missions
+    private static final ArrayList<Integer> booleanDCB =new ArrayList<>();// help array for the checked boxes when 0 refers to unchecked and 1 the opposite
+    private  LinearLayout linearLayout;
         @Override
         protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
@@ -43,18 +41,15 @@ public class DailyTasksPage extends AppCompatActivity {
      * save the data by calling saveAppData()
      */
     private void updateAppData(){
-        ArrayList<Integer> kkk = (ArrayList<Integer>) bolleansDCB.clone();
-        if(!MainActivity.appData.containsKey("bolleansDCB")) {
-            MainActivity.appData.put("bolleansDCB", kkk);
+        ArrayList<Integer> kkk = (ArrayList<Integer>) booleanDCB.clone();
+        if(!MainActivity.appData.containsKey("booleanDCB")) {
+            MainActivity.appData.put("booleanDCB", kkk);
+        } else{
+            MainActivity.appData.replace("booleanDCB",kkk);
         }
-        else{
-            MainActivity.appData.replace("bolleansDCB",kkk);
-
-        }
-        if(!MainActivity.appData.containsKey("monthlyDission")) {
+        if(!MainActivity.appData.containsKey("dailyMission")) {
             MainActivity.appData.put("dailyMission", dailyMission);
-        }
-        else{
+        } else{
             MainActivity.appData.replace("dailyMission",dailyMission);
         }
         MainActivity m = new MainActivity();
@@ -66,12 +61,11 @@ public class DailyTasksPage extends AppCompatActivity {
      */
     @SuppressLint("CutPasteId")
     private void initializeComponent() {
-        DailyProgressBar = findViewById(R.id.DailyProgressBar);
+        dailyProgressBar = findViewById(R.id.DailyProgressBar);
         removeButtonDaily=findViewById(R.id.removeDailyMissions);
         clearAllButtonDaily=findViewById(R.id.clearAllDailyButton);
-        //linearLayout=(LinearLayout) scrollView.getChildAt(0);
         linearLayout=(LinearLayout) ((ScrollView) findViewById(R.id.dailyTasksScrollview)).getChildAt(0);
-        DailyProgressBar.setMax(100);
+        dailyProgressBar.setMax(100);
 
         for (int i = 0; i <linearLayout.getChildCount() ; i++) {
             CheckBox c =(CheckBox) linearLayout.getChildAt(i);
@@ -86,7 +80,7 @@ public class DailyTasksPage extends AppCompatActivity {
      * @param v: View? Trash button
      */
     public void removeDailySelectedMissions(View v){
-        removeMssions("remove");
+        removeMissions("remove");
         updateButtonsVisibility();
         updateAppData();
         alarmManager();
@@ -100,7 +94,7 @@ public class DailyTasksPage extends AppCompatActivity {
      * @param v: View? clear all button
      */
     public void clearAllDailySelectedMissions(View v){
-        removeMssions("clear");
+        removeMissions("clear");
         updateButtonsVisibility();
         updateAppData();
         alarmManager();
@@ -111,31 +105,22 @@ public class DailyTasksPage extends AppCompatActivity {
      * update the checkBoxes Check state based on the the array list bb contain if its 1 change to true otherwise to false
      */
     private void updateCheckBoxes() {
-
-
         linearLayout.removeAllViews();
-
         ArrayList<Integer> bb = new ArrayList<Integer>();
-        for (int i = 0; i < bolleansDCB.size() ; i++) {
-            bb.add(i,bolleansDCB.get(i));
+        for (int i = 0; i < booleanDCB.size() ; i++) {
+            bb.add(i, booleanDCB.get(i));
         }
         for (int i = 0; i <dailyMission.size(); i++) {
             CheckBox checkBox = new CheckBox(this);
             checkBox.setOnCheckedChangeListener(new DailyMissionCheck());
             linearLayout.addView(checkBox);
-            //CheckBox checkBox =(CheckBox) linearLayout.getChildAt(i);
-
             checkBox.setVisibility(View.VISIBLE);
             checkBox.setText(getDailyMission().get(i));
             checkBox.setChecked(false);
             try{
-                if(bb.get(i)==1){
-                    checkBox.setChecked(true);
-                }
-            }catch(Exception e){
+                if(bb.get(i)==1) checkBox.setChecked(true);
 
-            }
-
+            }catch(Exception ignored){}
         }
     }
     /**
@@ -148,12 +133,10 @@ public class DailyTasksPage extends AppCompatActivity {
      * make the progressbar zero
      * @param doFun: String the order as a String
      */
-    private void removeMssions(String doFun) {
+    private void removeMissions(String doFun) {
         for (int j=0; j< linearLayout.getChildCount();j++) {
             CheckBox c =(CheckBox) linearLayout.getChildAt(j);
-            if (c.isChecked() && doFun == "remove") {
-                dailyMission.remove(c.getText().toString());
-            } else if (doFun == "clear") {
+            if ((c.isChecked() && Objects.equals(doFun, "remove")) || Objects.equals(doFun, "clear")) {
                 dailyMission.remove(c.getText().toString());
             }
             c.setVisibility(View.INVISIBLE);
@@ -165,8 +148,8 @@ public class DailyTasksPage extends AppCompatActivity {
             checkBox.setVisibility(View.VISIBLE);
             checkBox.setText(getDailyMission().get(i));
         }
-        bolleansDCB.clear();
-        DailyProgressBar.setProgress(0);
+        booleanDCB.clear();
+        dailyProgressBar.setProgress(0);
 
 
     }
@@ -175,12 +158,12 @@ public class DailyTasksPage extends AppCompatActivity {
      */
     private void updateProgressBar() {
         if(dailyMission.size()>0) {
-            double x =(double) ((double) numberDailyMisissionChecked / (double) dailyMission.size()) * 100;
-            dailyMissionProgressPercent =(int) x;
-            DailyProgressBar.setProgress(dailyMissionProgressPercent);
+            double dailyMissionProgressPercent =(double) ((double) numberDailyMissionChecked / (double) dailyMission.size()) * 100;
+            // the current progressbar present
+            dailyProgressBar.setProgress((int) dailyMissionProgressPercent);
         }
         else{
-            DailyProgressBar.setProgress(0);
+            dailyProgressBar.setProgress(0);
         }
     }
     /**
@@ -199,23 +182,16 @@ public class DailyTasksPage extends AppCompatActivity {
      * updateBooleansDCB function which update booleanDCB values based on if the checkBoxes is checked or not -> checked =1 otherwise =0
      */
     private void updateBooleansDCB() {
-        bolleansDCB.clear();
-        numberDailyMisissionChecked = 0;
+        booleanDCB.clear();
+        numberDailyMissionChecked = 0;
         for (int j=0;j<linearLayout.getChildCount();j++) {
             CheckBox c =(CheckBox) linearLayout.getChildAt(j);
-            /*if (c.isChecked() ) {
-                numberDailyMisissionChecked++;
-                bolleansDCB.set(j,1);
-            } else {
-                bolleansDCB.set(j,0);
-            }
 
-             */
             if (c.isChecked() ) {
-                numberDailyMisissionChecked++;
-                bolleansDCB.add(j,1);
+                numberDailyMissionChecked++;
+                booleanDCB.add(j,1);
             } else {
-                bolleansDCB.add(j,0);
+                booleanDCB.add(j,0);
             }
         }
     }
@@ -223,19 +199,25 @@ public class DailyTasksPage extends AppCompatActivity {
      * downloadDailyMissionsData function which download the data from the main appData map for this activity and set it into the activity variables booleanDCB,dailyMission
      */
     private void downloadDailyMissionsData() {
-        if(MainActivity.appData.containsKey("bolleansDCB")||MainActivity.appData.containsKey("dailyMission")){
-            for (int i = 0; i <bolleansDCB.size() ; i++) {
-                Object d = MainActivity.appData.get("bolleansDCB").get(i);
-                Double dd=Double.parseDouble(d.toString());
-                bolleansDCB.set(i,dd.intValue());
+        if(MainActivity.appData.containsKey("booleanDCB")||MainActivity.appData.containsKey("dailyMission")){
+            for (int i = 0; i < booleanDCB.size() ; i++) {
+                Object d = Objects.requireNonNull(MainActivity.appData.get("booleanDCB")).get(i);
+                double dd=Double.parseDouble(d.toString());
+                booleanDCB.set(i, (int) dd);
             }
             dailyMission=MainActivity.appData.get("dailyMission");
         }
     }
-
-    public  ArrayList<String>  getDailyMissionsArrayList(){
-        return dailyMission;
+    /**
+     * DailyMissionPageInsertGo Add Mission button function which goes to the insert Page
+     * @param v: View Add Mission button
+     */
+    public void DailyMissionPageInsertGo(View v){
+        Intent i = new Intent(this, TasksInsert.class);
+        i.putExtra("sender","DailyTasksPage");
+        startActivity(i);
     }
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();
@@ -243,15 +225,7 @@ public class DailyTasksPage extends AppCompatActivity {
         startActivity(i);
     }
 
-    /**
-     * DailyMissionPageInsertGo Add Mission button function which goes to the insert Page
-     * @param v: View Add Mission button
-     */
-    public void DailyMissionPageInsertGo(View v){
-            Intent i = new Intent(this,DailyTasksInsert.class);
-            i.putExtra("sender","DailyTasksPage");
-            startActivity(i);
-        }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -273,11 +247,11 @@ public class DailyTasksPage extends AppCompatActivity {
 
 
     private void alarmManager(){
-        if(dailyMission.isEmpty()|| DailyProgressBar.getProgress()==100){
+        if(dailyMission.isEmpty()|| dailyProgressBar.getProgress()==100){
             MainActivity m = new MainActivity();
             m.stopAlarmManager(MainActivity.alarmManagerDaily,1);
         }
-        else if(!dailyMission.isEmpty() && DailyProgressBar.getProgress()!=100){
+        else if(!dailyMission.isEmpty() && dailyProgressBar.getProgress()!=100){
             MainActivity m = new MainActivity();
             m.resumeAlarmManager(MainActivity.alarmManagerDaily,1);
         }
