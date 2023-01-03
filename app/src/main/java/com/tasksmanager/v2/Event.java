@@ -3,23 +3,17 @@ package com.tasksmanager.v2;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Observable;
 
 public class Event {
-
-    public Event() {
-
-    }
+    public Event() {}
 
     LocalDate date;
-    String Desccription;
+    String Description;
     LocalTime time;
 
-    public Event(LocalDate date, String eventDesccription, LocalTime time) {
+    public Event(LocalDate date, String eventDescription, LocalTime time) {
         this.date = date;
-        this.Desccription = eventDesccription;
+        this.Description = eventDescription;
         this.time = time;
     }
 

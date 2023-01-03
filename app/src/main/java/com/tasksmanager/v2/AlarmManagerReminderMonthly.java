@@ -11,8 +11,6 @@ import android.net.Uri;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
-//import androidx.core.app.NotificationCompat;
-//import androidx.core.app.NotificationManagerCompat;
 
 public class AlarmManagerReminderMonthly extends BroadcastReceiver {
 
@@ -34,8 +32,6 @@ public class AlarmManagerReminderMonthly extends BroadcastReceiver {
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setSound(sound)
                 ;
-
-
 
         NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(context);
         notificationManagerCompat.notify(201,MonthlyMissionNotification.build());

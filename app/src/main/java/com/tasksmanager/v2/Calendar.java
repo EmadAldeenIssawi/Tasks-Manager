@@ -53,7 +53,6 @@ public class Calendar extends AppCompatActivity {
         return selectedDate;
     }
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -159,7 +158,7 @@ public class Calendar extends AppCompatActivity {
             ) {
                 TableRow row = new TableRow(this);
                 TextView textView = new TextView(this);
-                s = "* "+e.date.toString() + "    " + e.Desccription + "    (" + e.time.toString() + ")\n";
+                s = "* "+e.date.toString() + "    " + e.Description + "    (" + e.time.toString() + ")\n";
                 textView.setText(s);
                 textView.setTextColor(Color.BLACK);
                 CheckBox checkBox = new CheckBox(this);
@@ -469,7 +468,7 @@ public class Calendar extends AppCompatActivity {
      */
     private void loadEventsOnDates(Map ll){
         Event e = new Event();
-        e.Desccription = String.valueOf(ll.get("Desccription"));
+        e.Description = String.valueOf(ll.get("Desccription"));
         String ds = String.valueOf(ll.get("date"));
         e.date = LocalDate.parse(ds);
         String ts = String.valueOf(ll.get("time"));

@@ -13,8 +13,12 @@ public class TasksInsert extends AppCompatActivity {
 
     private EditText editText;
     private String des="";
-    private String incomigIntent="";
+    private String incomingIntent ="";
 
+    /**
+     * initialize the global variables
+     * make window smaller
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -22,10 +26,9 @@ public class TasksInsert extends AppCompatActivity {
         Intent incomingIntent = getIntent();
         String senderTemp = incomingIntent.getStringExtra("sender");
         if(senderTemp!=null){
-           incomigIntent=senderTemp;
+           this.incomingIntent =senderTemp;
         }
 
-        // make the window smaller
         DisplayMetrics dm = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(dm);
         int width= dm.widthPixels;
@@ -34,18 +37,19 @@ public class TasksInsert extends AppCompatActivity {
         editText=findViewById(R.id.DailyMissionDes);
     }
 
+    /**
+     * if the user was on DailyTaskPage so go back there
+     * otherwise go back to MonthlyTasksPage
+     */
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        if(incomigIntent.equals("DailyTasksPage")){
-            Intent i= new Intent(this,DailyTasksPage.class);
-            startActivity(i);
-        }else if(incomigIntent.equals("MonthlyTasksPage")){
-            Intent i = new Intent(this,MonthlyTasksPage.class);
-            startActivity(i);
-
-
-        }
+        Intent i = new Intent();
+        if(incomingIntent.equals("DailyTasksPage"))
+            i= new Intent(this,DailyTasksPage.class);
+        else if(incomingIntent.equals("MonthlyTasksPage"))
+            i = new Intent(this,MonthlyTasksPage.class);
+        startActivity(i);
     }
 
     /**
@@ -55,6 +59,7 @@ public class TasksInsert extends AppCompatActivity {
     private void setDes(String des) {
         this.des = des;
     }
+
     /**
      * saveDailyMission Save button Function which save the event
      * Toast "Max 8 Mission" if the user would insert more than 8 missions and finish the function
@@ -66,20 +71,15 @@ public class TasksInsert extends AppCompatActivity {
 
         if(String.valueOf(editText.getText()).isEmpty()){
             Toast.makeText(this,"Enter a mission",Toast.LENGTH_LONG).show();
-        }
-        else{
+        } else{
             des =String.valueOf(editText.getText()).replace("\n", "");
             setDes(des);
             Intent i=null;
-            if(incomigIntent.equals("DailyTasksPage")) i= new Intent(this,DailyTasksPage.class);
-                else if(incomigIntent.equals("MonthlyTasksPage")) i = new Intent(this,MonthlyTasksPage.class);
+            if(incomingIntent.equals("DailyTasksPage")) i= new Intent(this,DailyTasksPage.class);
+            else if(incomingIntent.equals("MonthlyTasksPage")) i = new Intent(this,MonthlyTasksPage.class);
             assert i != null;
             i.putExtra("eventDescription",des);
             startActivity(i);
         }
-
     }
-
-
-
 }

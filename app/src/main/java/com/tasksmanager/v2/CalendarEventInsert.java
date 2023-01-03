@@ -1,13 +1,11 @@
 package com.tasksmanager.v2;
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import java.time.LocalDate;
@@ -19,32 +17,26 @@ public class CalendarEventInsert extends AppCompatActivity {
     private TextView  eventDate; //the textView that shows the selected date
     private TextView  eventTime; //the textView that show the selected time
     private LocalDate date; // selected date
+
+    /**
+     * initialize the components and get the date from the coming intent  and put it in the eventDate textView and set the timePicker
+     * set the date variable to the selected date and set onTimeChange Listener which will view the picked time on the timeTextView
+     */
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_calendar_event_insert);
 
-        // initialize the component and get the date from the coming intent  and put it in the eventDate textView and set the timePicker
         intiWidget();
-        // the time Picker that the user use to select time
         TimePicker timePicker = findViewById(R.id.timePicker);
         timePicker.setIs24HourView(true);
         eventDate.setText(getIntent().getStringExtra("date"));
-        // set the date variable to the selected date and set onTimeChange Listener which will view the picked time on the timeTextView
         Calendar c = new Calendar();
         date= c.getSelectedDate();
 
-        timePicker.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
-            @SuppressLint("SetTextI18n")
-            @Override
-            public void onTimeChanged(TimePicker timePicker, int i, int i1) {
-                eventTime.setText(timePicker.getHour() +":"+ timePicker.getMinute());
-            }
-        });
+        timePicker.setOnTimeChangedListener((timePicker1, i, i1) -> eventTime.setText(timePicker1.getHour() +":"+ timePicker1.getMinute()));
     }
-
-
-
 
     /**
      * onSaveInstanceState function which will save the current time to restore it then
@@ -78,9 +70,6 @@ public class CalendarEventInsert extends AppCompatActivity {
         eventTime=findViewById(R.id.timeInCEI);
     }
 
-
-
-
     /**
      * Save button function
      * if no time chose make toast with "enter a time"
@@ -89,10 +78,10 @@ public class CalendarEventInsert extends AppCompatActivity {
      * add the event to the hashtable eventsOnDate by calling addEvent(e)
      * add the selected day number to the hashtable monthlyEventsDaysTextViews by calling addDayNum()
      */
-    public void saveEventdes(View view) {
+    public void saveEventsDescription(View view) {
         String eventDs = eventDescription.getText().toString();
-        String h = null;
-        String m =null;
+        String h;
+        String m;
         String s = String.valueOf(eventTime.getText());
         int sub= s.indexOf(":");
         if (!s.isEmpty()) {
@@ -101,10 +90,8 @@ public class CalendarEventInsert extends AppCompatActivity {
             if (eventDs.isEmpty()) {
                 Toast.makeText(this, "Enter an event description", Toast.LENGTH_LONG).show();
             } else {
-                LocalTime timeforEvent = LocalTime.of(Integer.parseInt(h), Integer.parseInt(m));
-                Event e = new Event(date, eventDs, timeforEvent);
-
-
+                LocalTime timeForEvent = LocalTime.of(Integer.parseInt(h), Integer.parseInt(m));
+                Event e = new Event(date, eventDs, timeForEvent);
                 addEvent(e);
                 addDayNum();
                 finish();
@@ -124,14 +111,11 @@ public class CalendarEventInsert extends AppCompatActivity {
      */
     private void addEvent(Event e){
         if (Calendar.eventsOnDate.containsKey(date)) {
-            Calendar.eventsOnDate.get(date).add(e);
-            Calendar.eventsOnDate.get(date).sort(new Comparator<Event>() {
-                @Override
-                public int compare(Event event1, Event event2) {
-                    if(event1.time.isAfter(event2.time)) return 1;
-                    else if(event1.time.isBefore(event2.time)) return -1;
-                    else return 0;
-                }
+            Objects.requireNonNull(Calendar.eventsOnDate.get(date)).add(e);
+            Objects.requireNonNull(Calendar.eventsOnDate.get(date)).sort((event1, event2) -> {
+                if(event1.time.isAfter(event2.time)) return 1;
+                else if(event1.time.isBefore(event2.time)) return -1;
+                else return 0;
             });
         } else {
             ArrayList<Event> events = new ArrayList<>();
@@ -148,9 +132,9 @@ public class CalendarEventInsert extends AppCompatActivity {
     private void addDayNum(){
         if (Calendar.datesWithEventsOnMonth.containsKey(date.getMonth())) {
             int tempDay = date.getDayOfMonth();
-            if (!Calendar.datesWithEventsOnMonth.get(date.getMonth()).contains(tempDay)) {
-                Calendar.datesWithEventsOnMonth.get(date.getMonth()).add(date.getDayOfMonth());
-                Collections.sort(Calendar.datesWithEventsOnMonth.get(date.getMonth()));
+            if (!Objects.requireNonNull(Calendar.datesWithEventsOnMonth.get(date.getMonth())).contains(tempDay)) {
+                Objects.requireNonNull(Calendar.datesWithEventsOnMonth.get(date.getMonth())).add(date.getDayOfMonth());
+                Collections.sort(Objects.requireNonNull(Calendar.datesWithEventsOnMonth.get(date.getMonth())));
             }
         } else {
             ArrayList<Integer> days = new ArrayList<>();
