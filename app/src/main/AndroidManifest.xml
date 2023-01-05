@@ -82,8 +82,7 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/filepaths" />
         </provider>
-        <receiver android:name=".AlarmManagerReminderDaily" />
-        <receiver android:name=".AlarmManagerReminderMonthly" />
+        <receiver android:name=".AlarmManagerReminder" />
     </application>
 
 </manifest>

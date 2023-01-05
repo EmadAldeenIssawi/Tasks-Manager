@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.LinearLayout;
@@ -33,22 +34,27 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class Calendar extends AppCompatActivity {
     private CalendarView calendarview; // the calendar that the user use
     private Month  selectedMonth; //the current selected month by the user
     private LocalDateTime localTime; // current local time
     private final ArrayList<Integer> checkVariables= new ArrayList<>();
-    private ArrayList<Integer> afterRestorCheckVariables =  new ArrayList<>();
+    private ArrayList<Integer> afterRestoreCheckVariables =  new ArrayList<>();
     private int selectClick = 0 ;// help variable used in edit button function
     private Boolean restored=false; // help variable knowing that the screen is rotated and the restore function activated
     private static LocalDate selectedDate;////the current selected date by the user
     private Boolean thereCheckBoxChecked=false; //help variable which refers to the status of a checkbox
     private TextView eventsTextView,daysTextView; //text views that has words, "Events" and "Days"
-    private LinearLayout eventsDescriptionScrollView;//thescroll view that contains events description
+    private LinearLayout eventsDescriptionScrollView;//the scroll view that contains events description
     private LinearLayout daysWithEventsScrollView; // the table layout that contains the date that contains events
     public static HashMap<LocalDate, ArrayList<Event>>  eventsOnDate=new HashMap<>(); //hash table that has arraylists which has event and  each arraylist has date as key
     public static HashMap<Month, ArrayList<Integer>> datesWithEventsOnMonth =new HashMap<>(); // hashtable that has array lists that has numbers which represents dates that has events and  each array list has Month as a key
+    private Button clearAllButton; //clear all events in the hole month button
+    private Button selectEventsButton; // start the ability to select events button
+    private Button removeAllEventsButton; //remove all events in the selected day button
+    private Button removeEventsButton; // remove selected events button
     public  LocalDate getSelectedDate() {
         return selectedDate;
     }
@@ -89,8 +95,7 @@ public class Calendar extends AppCompatActivity {
 
         Object loadSelectVar = savedInstanceState.get("selectVariable");
         selectClick= (int)loadSelectVar ;
-        afterRestorCheckVariables = (ArrayList<Integer>) savedInstanceState.get("checkVariables");
-
+        afterRestoreCheckVariables = (ArrayList<Integer>) savedInstanceState.get("checkVariables");
         if(selectClick==1) {
             selectClick = 0;
             restored = true;
@@ -107,21 +112,16 @@ public class Calendar extends AppCompatActivity {
     private void create() {
         initializeComponents();
         downloadAllData();
-        calendarview.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
-            @Override
-            public void onSelectedDayChange(@NonNull CalendarView calendarView, int i, int i1, int i2) {
-                LocalDate date = LocalDate.of(i,i1+1,i2);
-                selectedDate=date;
-                selectedMonth=date.getMonth();
-                showEvents( );
-                if(datesWithEventsOnMonth.containsKey(selectedDate.getMonth())){
-                    showDays();
-                }
-                else {
-                    emptyEventsDates();
-                }
-                updateButtonsVisibility();
-            }
+        calendarview.setOnDateChangeListener((calendarView, i, i1, i2) -> {
+            LocalDate date = LocalDate.of(i,i1+1,i2);
+            selectedDate=date;
+            selectedMonth=date.getMonth();
+            showEvents( );
+            if(datesWithEventsOnMonth.containsKey(selectedDate.getMonth()))
+                showDays();
+            else
+                emptyEventsDates();
+            updateButtonsVisibility();
         });
     }
 
@@ -129,12 +129,15 @@ public class Calendar extends AppCompatActivity {
 
     /**
      * initialize global variable
-     * set an onCheck listener for each checkbox in the events tablelayout which will change visibility for Remove button based on if there any check box is checked or not
      */
     private void initializeComponents() {
         calendarview = findViewById(R.id.calendarView2);
         eventsTextView=findViewById(R.id.eventTextView);
         daysTextView=findViewById(R.id.daysTextView);
+        clearAllButton=findViewById(R.id.clearAll);
+        selectEventsButton=findViewById(R.id.selectEvents);
+        removeAllEventsButton=findViewById(R.id.RemoveAllEvents);
+        removeEventsButton=findViewById(R.id.removeEvents);
         eventsDescriptionScrollView =(LinearLayout) ((ScrollView) findViewById(R.id.eventsScrollView)).getChildAt(0);
         daysWithEventsScrollView = (LinearLayout) ((ScrollView) findViewById(R.id.scrollViewEventsDays)).getChildAt(0);
         long l = calendarview.getDate();
@@ -152,9 +155,9 @@ public class Calendar extends AppCompatActivity {
     private void showEvents() {
         emptyEvents();
         if (eventsOnDate.containsKey(selectedDate)) {
-            String s = "";
+            String s;
 
-            for (Event e : eventsOnDate.get(selectedDate)
+            for (Event e : Objects.requireNonNull(eventsOnDate.get(selectedDate))
             ) {
                 TableRow row = new TableRow(this);
                 TextView textView = new TextView(this);
@@ -162,7 +165,7 @@ public class Calendar extends AppCompatActivity {
                 textView.setText(s);
                 textView.setTextColor(Color.BLACK);
                 CheckBox checkBox = new CheckBox(this);
-                checkBox.setVisibility(View.INVISIBLE);
+                setInVisible(checkBox);
                 checkBox.setOnCheckedChangeListener(new EventCheck());
                 TableRow.LayoutParams params = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT,
                         TableRow.LayoutParams.FILL_PARENT);
@@ -186,14 +189,12 @@ public class Calendar extends AppCompatActivity {
      * show checkboxes in the scrollview based on if the select button is already clicked or not
      */
     private void showCheckBoxesIfSelectClicked(){
-
         for (int i = 0; i < eventsDescriptionScrollView.getChildCount(); i++) {
             TableRow row = (TableRow) eventsDescriptionScrollView.getChildAt(i);
             CheckBox cb = (CheckBox) row.getChildAt(0);
-            if (selectClick == 1) cb.setVisibility(View.VISIBLE);
-            else cb.setVisibility(View.INVISIBLE);
+            if (selectClick == 1) setVisible(cb);
+            else setInVisible(cb);
         }
-
     }
 
     /**
@@ -205,16 +206,15 @@ public class Calendar extends AppCompatActivity {
     @SuppressLint("SetTextI18n")
     private void showDays() {
         emptyEventsDates();
-        for (int i = 0; i< datesWithEventsOnMonth.get(selectedDate.getMonth()).size(); i++) {
+        for (int i = 0; i< Objects.requireNonNull(datesWithEventsOnMonth.get(selectedDate.getMonth())).size(); i++) {
             TextView textView = new TextView(this);
             daysWithEventsScrollView.addView(textView,i);
-            textView.setText(Integer.toString(datesWithEventsOnMonth.get(selectedDate.getMonth()).get(i)));
-            if(Integer.parseInt(String.valueOf(localTime.getDayOfMonth()))> datesWithEventsOnMonth.get(selectedDate.getMonth()).get(i)){
+            textView.setText(Integer.toString(Objects.requireNonNull(datesWithEventsOnMonth.get(selectedDate.getMonth())).get(i)));
+            if(Integer.parseInt(String.valueOf(localTime.getDayOfMonth()))> Objects.requireNonNull(datesWithEventsOnMonth.get(selectedDate.getMonth())).get(i)){
                 textView.setTextColor(Color.DKGRAY);
             } else {
                 textView.setTextColor(Color.BLUE);
             }
-
         }
     }
 
@@ -226,24 +226,19 @@ public class Calendar extends AppCompatActivity {
      * if the selected month has no day that has event in it so change visibility for Clear all button, Remove All button and Edit button to Invisible
      */
     private void updateButtonsVisibility() {
+        setInVisible(clearAllButton);
+        setInVisible(selectEventsButton);
+        setInVisible(removeAllEventsButton);
+        setInVisible(daysTextView);
+        setInVisible(eventsTextView);
         if(datesWithEventsOnMonth.get(selectedMonth)!=null) {
-            findViewById(R.id.clearAll).setVisibility(View.VISIBLE);
-            daysTextView.setVisibility(View.VISIBLE);
+            setVisible(clearAllButton);
+            setVisible(daysTextView);
             if (eventsOnDate.get(selectedDate) != null) {
-                findViewById(R.id.selectEvents).setVisibility(View.VISIBLE);
-                findViewById(R.id.RemoveAllEvents).setVisibility(View.VISIBLE);
-                eventsTextView.setVisibility(View.VISIBLE);
-            } else {
-                findViewById(R.id.selectEvents).setVisibility(View.INVISIBLE);
-                findViewById(R.id.RemoveAllEvents).setVisibility(View.INVISIBLE);
-                eventsTextView.setVisibility(View.INVISIBLE);
+                setVisible(selectEventsButton);
+                setVisible(removeAllEventsButton);
+                setVisible(eventsTextView);
             }
-        } else{
-            findViewById(R.id.clearAll).setVisibility(View.INVISIBLE);
-            findViewById(R.id.selectEvents).setVisibility(View.INVISIBLE);
-            findViewById(R.id.RemoveAllEvents).setVisibility(View.INVISIBLE);
-            daysTextView.setVisibility(View.INVISIBLE);
-            eventsTextView.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -270,35 +265,30 @@ public class Calendar extends AppCompatActivity {
      * @param view Select Button
      */
     public void selectEvents(View view) {
-        if(eventsOnDate.get(selectedDate).size()==0){
+        if(Objects.requireNonNull(eventsOnDate.get(selectedDate)).size()==0){
             Toast.makeText(this,"No events to edit",Toast.LENGTH_LONG).show();
         } else {
             if (selectClick == 0) {
                 for (int i = 0; i < eventsDescriptionScrollView.getChildCount(); i++) {
                     TableRow row = (TableRow) eventsDescriptionScrollView.getChildAt(i);
                     CheckBox cb = (CheckBox) row.getChildAt(0);
-
-                    cb.setVisibility(View.VISIBLE);
+                    setVisible(cb);
                 }
-
                 selectClick++;
-                findViewById(R.id.selectEvents).setBackgroundColor(Color.DKGRAY);
-                if(thereCheckBoxChecked)findViewById(R.id.removeEvents).setVisibility(View.VISIBLE);
-
-
+                selectEventsButton.setBackgroundColor(Color.DKGRAY);
+                if(thereCheckBoxChecked) setVisible(removeEventsButton);
             } else if (selectClick == 1) {
                 for (int i = 0; i < eventsDescriptionScrollView.getChildCount(); i++) {
                     TableRow row = (TableRow) eventsDescriptionScrollView.getChildAt(i);
                     CheckBox cb = (CheckBox) row.getChildAt(0);
-
-                    cb.setVisibility(View.INVISIBLE);
+                    setInVisible(cb);
                 }
                 selectClick--;
-                findViewById(R.id.selectEvents).setBackgroundColor(ResourcesCompat.getColor(getResources(), R.color.naivy, null)); //without theme
-                findViewById(R.id.removeEvents).setVisibility(View.INVISIBLE);
-
+                selectEventsButton.setBackgroundColor(ResourcesCompat.getColor(getResources(), R.color.naivy, null)); //without theme
+                setInVisible(removeEventsButton);
             }
         }
+
     }
 
 
@@ -314,31 +304,16 @@ public class Calendar extends AppCompatActivity {
      *@param v Remove all button
      */
     public void removeAllEvents(View v) {
-        if(eventsOnDate.get(selectedDate)!=null) {
+        if(eventsOnDate.get(selectedDate)!=null)
             eventsOnDate.remove(selectedDate);
-        }
         showEvents();
-        datesWithEventsOnMonth.get(selectedDate.getMonth()).remove((Integer) selectedDate.getDayOfMonth());
-
-
+        Objects.requireNonNull(datesWithEventsOnMonth.get(selectedDate.getMonth())).remove((Integer) selectedDate.getDayOfMonth());
         emptyEventsDates();
         showDays();
-        /*for (int i = 0; i < linearLayout.getChildCount(); i++) {
-            TableRow row = (TableRow) linearLayout.getChildAt(i);
-            CheckBox cb = (CheckBox) row.getChildAt(0);
-            cb.setVisibility(View.INVISIBLE);
-        }
-
-         */
         emptyEvents();
-        findViewById(R.id.selectEvents).setBackgroundColor(ResourcesCompat.getColor(getResources(), R.color.naivy, null)); //without theme
-        findViewById(R.id.removeEvents).setVisibility(View.INVISIBLE);
-        findViewById(R.id.RemoveAllEvents).setVisibility(View.INVISIBLE);
-        findViewById(R.id.selectEvents).setVisibility(View.INVISIBLE);
-
-
+        selectEventsButton.setBackgroundColor(ResourcesCompat.getColor(getResources(), R.color.naivy, null)); //without theme
+        updateButtonsVisibility();
         uploadAppData();
-
     }
 
     /**
@@ -360,9 +335,9 @@ public class Calendar extends AppCompatActivity {
             TextView t = (TextView) r.getChildAt(1);
             if (c.isChecked() && t.getText()!="") numChecked++;
         }
-        if (((eventsOnDate.get(selectedDate).size()==1)&&(numChecked!=0)) || numChecked == eventsOnDate.get(selectedDate).size()) {
+        if (((Objects.requireNonNull(eventsOnDate.get(selectedDate)).size()==1)&&(numChecked!=0)) || numChecked == Objects.requireNonNull(eventsOnDate.get(selectedDate)).size()) {
             View vn = null;
-            if (datesWithEventsOnMonth.get(selectedMonth).size()==1
+            if (Objects.requireNonNull(datesWithEventsOnMonth.get(selectedMonth)).size()==1
             ) {
                 clearAllEvents(vn);
             } else {
@@ -374,8 +349,7 @@ public class Calendar extends AppCompatActivity {
                 CheckBox c = (CheckBox) r.getChildAt(0);
                 TextView t = (TextView) r.getChildAt(1);
                 if (c.isChecked() && t.getText()!="") {
-                    int ii=i;
-                    eventsOnDate.get(selectedDate).remove(ii);
+                    Objects.requireNonNull(eventsOnDate.get(selectedDate)).remove(i);
                     eventsDescriptionScrollView.removeViewAt(i);
                 }
             }
@@ -384,7 +358,8 @@ public class Calendar extends AppCompatActivity {
             selectEvents(vr);
         }
         updateButtonsVisibility();
-        uploadAppData();
+        uploadAppData()
+
 
 
     }
@@ -401,7 +376,7 @@ public class Calendar extends AppCompatActivity {
      */
     public void clearAllEvents(View view) {
         if (datesWithEventsOnMonth.get(selectedMonth)!=null) {
-            for (int dayInt : datesWithEventsOnMonth.get(selectedMonth)
+            for (int dayInt : Objects.requireNonNull(datesWithEventsOnMonth.get(selectedMonth))
             ) {
                 LocalDate d = LocalDate.of(selectedDate.getYear(), selectedMonth, dayInt);
 
@@ -413,14 +388,10 @@ public class Calendar extends AppCompatActivity {
         }
         emptyEventsDates();
         emptyEvents();
-        findViewById(R.id.selectEvents).setBackgroundColor(ResourcesCompat.getColor(getResources(), R.color.naivy, null)); //without theme
-
-        findViewById(R.id.removeEvents).setVisibility(View.INVISIBLE);
-        findViewById(R.id.clearAll).setVisibility(View.INVISIBLE);
-        findViewById(R.id.RemoveAllEvents).setVisibility(View.INVISIBLE);
-        findViewById(R.id.selectEvents).setVisibility(View.INVISIBLE);
+        selectEventsButton.setBackgroundColor(ResourcesCompat.getColor(getResources(), R.color.naivy, null)); //without theme
 
 
+        updateButtonsVisibility();
         uploadAppData();
     }
 
@@ -446,14 +417,14 @@ public class Calendar extends AppCompatActivity {
             Month month = Month.valueOf(String.valueOf(m));
             ArrayList<Integer> arrayList = (ArrayList<Integer>) a.get(m);
             ArrayList<Integer> arrayList1 = new ArrayList<>();
-            for (int i = 0; i < arrayList.size(); i++) {
-                Object o = arrayList.get(i);
-                int s = ((Number) o).intValue();
+            for (int i = 0; i < Objects.requireNonNull(arrayList).size(); i++) {
+                Number o = arrayList.get(i);
+                int s = o.intValue();
 
                 arrayList1.add(s);
             }
             if (datesWithEventsOnMonth.containsKey(month)) {
-                Collections.copy(datesWithEventsOnMonth.get(month), arrayList1);
+                Collections.copy(Objects.requireNonNull(datesWithEventsOnMonth.get(month)), arrayList1);
             } else {
                 datesWithEventsOnMonth.put(month, arrayList1);
             }
@@ -468,13 +439,13 @@ public class Calendar extends AppCompatActivity {
      */
     private void loadEventsOnDates(Map ll){
         Event e = new Event();
-        e.Description = String.valueOf(ll.get("Desccription"));
+        e.Description = String.valueOf(ll.get("Description"));
         String ds = String.valueOf(ll.get("date"));
         e.date = LocalDate.parse(ds);
         String ts = String.valueOf(ll.get("time"));
         e.time = LocalTime.parse(ts);
         if (eventsOnDate.containsKey(e.date)) {
-            eventsOnDate.get(e.date).add(e);
+            Objects.requireNonNull(eventsOnDate.get(e.date)).add(e);
         } else {
             ArrayList<Event> ev = new ArrayList<>();
             ev.add(e);
@@ -517,6 +488,12 @@ public class Calendar extends AppCompatActivity {
             }
         }
     }
+    private void setVisible(View v){
+        v.setVisibility(View.VISIBLE);
+    }
+    private void setInVisible(View v){
+        v.setVisibility(View.INVISIBLE);
+    }
     /**
      * create an arraylist<Event> and add all events for each day
      * put the arrayList in the main appdata Hashmap <String, ArrayList>
@@ -526,10 +503,8 @@ public class Calendar extends AppCompatActivity {
      */
     private void uploadAppData() {
         ArrayList<Event> events =new ArrayList<>();
-        for (LocalDate d : eventsOnDate.keySet()) {///////////////////////////**************************
-            for (int i = 0; i < eventsOnDate.get(d).size() ; i++) {
-                events.add(eventsOnDate.get(d).get(i));
-            }
+        for (LocalDate d : eventsOnDate.keySet()) {
+            events.addAll(Objects.requireNonNull(eventsOnDate.get(d)));
         }
         if(!MainActivity.appData.containsKey("eventsOnDateEvents"))
             MainActivity.appData.put("eventsOnDateEvents",events);
@@ -569,7 +544,7 @@ public class Calendar extends AppCompatActivity {
             View v = null;
             selectEvents(v);
             checkVariables.clear();
-            checkVariables.addAll(afterRestorCheckVariables);
+            checkVariables.addAll(afterRestoreCheckVariables);
             for (int i = 0; i< eventsDescriptionScrollView.getChildCount(); i++) {
                 TableRow r = (TableRow) eventsDescriptionScrollView.getChildAt(i) ;
                 CheckBox c =(CheckBox) r.getChildAt(0);
@@ -579,6 +554,8 @@ public class Calendar extends AppCompatActivity {
             }
             restored=false;
         }
+        updateButtonsVisibility();
+
     }
     class EventCheck implements CompoundButton.OnCheckedChangeListener {
         /**
@@ -593,16 +570,16 @@ public class Calendar extends AppCompatActivity {
                 TableRow r = (TableRow) eventsDescriptionScrollView.getChildAt(i);
                 CheckBox c = (CheckBox) r.getChildAt(0);
                 if (c.isChecked()) {
-                    findViewById(R.id.removeEvents).setVisibility(View.VISIBLE);
-                    checkVariables.set(i,1);
+                    setVisible(removeEventsButton);
+
+                    checkVariables.add(i,1);
                     thereCheckBoxChecked=true;
                 } else if (!c.isChecked()) {
-                    checkVariables.set(i,0);
+                    checkVariables.add(i,0);
                 }
-
             }
             if (!thereCheckBoxChecked) {
-                findViewById(R.id.removeEvents).setVisibility(View.INVISIBLE);
+                setInVisible(removeEventsButton);
             }
 
         }

@@ -1,10 +1,8 @@
 package com.tasksmanager.v2;
 
 import android.annotation.SuppressLint;
-import android.content.ClipData;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.icu.util.TimeZone;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -15,16 +13,11 @@ import android.app.AlarmManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.icu.util.Calendar;
-import android.media.AudioAttributes;
-import android.net.Uri;
 import android.os.Build;
-import android.os.Bundle;
-import android.text.format.Time;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -32,11 +25,8 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
-import androidx.appcompat.view.menu.MenuView;
 
 import com.google.gson.Gson;
 import com.google.common.reflect.TypeToken;
@@ -48,7 +38,6 @@ import com.google.gson.JsonSerializer;
 
 import java.lang.reflect.Type;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -72,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
     private MenuItem removeOption;
     public static Intent iD;
     public static Intent iM;
+    public static String alarmMassage ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,9 +81,11 @@ public class MainActivity extends AppCompatActivity {
 
         //initialize the alarm components
         createNotificationChannel();
-        iD = new Intent(MainActivity.this, AlarmManagerReminderDaily.class);
+        alarmMassage="You have unfinished daily task to do!";
+        iD = new Intent(MainActivity.this, AlarmManagerReminder.class);
         iD.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-        iM =new Intent(MainActivity.this,AlarmManagerReminderMonthly.class);
+        alarmMassage="You have unfinished monthly task to do!";
+        iM =new Intent(MainActivity.this,AlarmManagerReminder.class);
         iM.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
 
         pendingIntentDaily = PendingIntent.getBroadcast(MainActivity.this, 0, iD, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
@@ -180,7 +172,7 @@ public class MainActivity extends AppCompatActivity {
                 calendar.set(Calendar.SECOND,1);
                 calendar.set(Calendar.MILLISECOND,1);
 
-                 //alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), 1000*60*60*24, pendingIntentDaily);
+                 alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), 1000*60*60*24, pendingIntentDaily);
                  //alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 1000*60*3, pendingIntentDaily);
             }
             else if(alarm==2){
@@ -189,7 +181,7 @@ public class MainActivity extends AppCompatActivity {
                 calendar.set(Calendar.HOUR,16 );
                 calendar.set(Calendar.MINUTE, 1);
                 calendar.set(Calendar.SECOND, 1);
-                //alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), 1000*60*60*24, pendingIntentMonthly);
+                alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), 1000*60*60*24, pendingIntentMonthly);
             }
 
 
@@ -330,17 +322,5 @@ public class MainActivity extends AppCompatActivity {
             updateBackground();
             setCount=0;
         }
-    }
-}
-class LocalDateAdapter implements JsonSerializer<LocalDate> {
-
-    public JsonElement serialize(LocalDate date, Type typeOfSrc, JsonSerializationContext context) {
-        return new JsonPrimitive(date.format(DateTimeFormatter.ISO_LOCAL_DATE)); // "yyyy-mm-dd"
-    }
-}
-class LocalTimeAdapter implements JsonSerializer<LocalTime> {
-
-    public JsonElement serialize(LocalTime date, Type typeOfSrc, JsonSerializationContext context) {
-        return new JsonPrimitive(date.format(DateTimeFormatter.ofPattern("hh:mm"))); // "yyyy-mm-dd"
     }
 }
