@@ -2,6 +2,7 @@ package com.tasksmanager.v2;
 
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -192,6 +193,21 @@ public  abstract  class TasksOperations extends AppCompatActivity {
             tasks.add(descriptionTemp);
             incomingIntent.removeExtra("eventDescription");
 
+        }
+    }
+
+    /**
+     * change checkBox color to gray if it is checked
+     * @param linearLayout
+     */
+    public void checkboxChangeColor (LinearLayout linearLayout){
+        for (int i = 0; i < linearLayout.getChildCount(); i++) {
+            CheckBox c = (CheckBox) linearLayout.getChildAt(i);
+            if (c.isChecked()) {
+                c.setBackgroundColor(Color.GRAY);
+            } else if (!c.isChecked()) {
+                c.setBackgroundColor(Integer.parseInt(String.valueOf(0xC3C6C8)));
+            }
         }
     }
 }

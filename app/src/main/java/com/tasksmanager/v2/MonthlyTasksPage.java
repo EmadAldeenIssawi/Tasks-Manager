@@ -133,6 +133,7 @@ public class MonthlyTasksPage extends TasksOperations {
             updateProgressBar(monthlyMission,monthlyProgressBar,numberMonthlyMissionChecked);
             updateAppData("booleanMCB","monthlyMission",monthlyMission,booleanMCB);
             alarmManager(monthlyMission,monthlyProgressBar);
+            checkboxChangeColor(linearLayout);
         }
     }
 }

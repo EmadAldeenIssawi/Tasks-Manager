@@ -2,6 +2,7 @@ package com.tasksmanager.v2;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -10,6 +11,7 @@ import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
+import android.widget.TableRow;
 
 import java.util.ArrayList;
 
@@ -134,6 +136,7 @@ public class DailyTasksPage  extends TasksOperations {
                 updateProgressBar(dailyMission,dailyProgressBar,numberDailyMissionChecked);
                 updateAppData("booleanDCB","dailyMission",dailyMission,booleanDCB);
                 alarmManager(dailyMission,dailyProgressBar);
+                checkboxChangeColor(linearLayout);
             }
         }
 }

@@ -4,11 +4,8 @@ import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
-
 import android.app.AlarmManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -23,41 +20,30 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
-import android.widget.Button;
 import android.widget.ImageView;
-
 import androidx.appcompat.app.AppCompatDelegate;
-
 import com.google.gson.Gson;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
-
 import java.lang.reflect.Type;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
-
+import java.util.Objects;
 
 
 public class MainActivity extends AppCompatActivity {
     public static int setCount=0; // help Variable refers that the user clicked the selectBackground button
     private Window window;
     private View screenView;
-    private Button removeBackgroundButton ;
     public static SharedPreferences sharedPreferences;
     public static HashMap<String, ArrayList> appData = new HashMap<>();
     public static AlarmManager alarmManagerDaily;
     public static AlarmManager alarmManagerMonthly;
     public static PendingIntent pendingIntentDaily;
     public static PendingIntent pendingIntentMonthly;
-    private Menu menu;
     private MenuItem removeOption;
     public static Intent iD;
     public static Intent iM;
@@ -87,16 +73,10 @@ public class MainActivity extends AppCompatActivity {
         alarmMassage="You have unfinished monthly task to do!";
         iM =new Intent(MainActivity.this,AlarmManagerReminder.class);
         iM.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
-
         pendingIntentDaily = PendingIntent.getBroadcast(MainActivity.this, 0, iD, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
-        //pendingIntentDaily = PendingIntent.getBroadcast(MainActivity.this, 0, iD, 0);
-
         pendingIntentMonthly= PendingIntent.getBroadcast(MainActivity.this,0,iM,PendingIntent.FLAG_IMMUTABLE|PendingIntent.FLAG_UPDATE_CURRENT);
-
         alarmManagerDaily = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         alarmManagerMonthly=(AlarmManager) getSystemService(Context.ALARM_SERVICE);
-
-
     }
     /**
      * download the Image as A string from the appData map
@@ -107,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
     @SuppressLint("ResourceType")
     private void downloadBackGround(){
         if(appData.containsKey("backgroundImage")){
-            String s = (String) appData.get("backgroundImage").get(0);
+            String s = (String) Objects.requireNonNull(appData.get("backgroundImage")).get(0);
             byte[] imageBytes = Base64.getDecoder().decode(s);
             Bitmap image = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
             ImageView loadedImageView = findViewById(R.id.helpImageView);
@@ -116,11 +96,8 @@ public class MainActivity extends AppCompatActivity {
             screenView.setBackground(loadedImageView.getBackground());
             window.setBackgroundDrawable(loadedImageView.getDrawable());
             if(removeOption!=null)removeOption.setVisible(true);
-
         }
     }
-
-
 
     /**
      * if the user took a picture or selected a picture from the gallery so set it as a window background
@@ -133,7 +110,6 @@ public class MainActivity extends AppCompatActivity {
             screenView.setBackground(im.getBackground());
             window.setBackgroundDrawable(im.getDrawable());
             if(removeOption!=null) removeOption.setVisible(true);
-
         }
     }
 
@@ -145,49 +121,56 @@ public class MainActivity extends AppCompatActivity {
             appData.remove("backgroundImage");
             saveAppData();
             setContentView(R.layout.activity_main);
-
-
         }
     }
 
+    /**
+     * stops the alarm for the meant alarm based in the integer alarm
+     * if the integer ==1, the daily alarm will be canceled
+     * otherwise the monthly alarm will be canceled
+     * @param alarmManager the main alarmManager
+     * @param alarm the integer refers for which pendingIntent will be canceled
+     */
     public void stopAlarmManager(AlarmManager alarmManager, int alarm) {
-        if (alarm == 1) {
-            if (alarmManager != null)
+        if (alarm == 1 && alarmManager != null)
                 alarmManager.cancel(pendingIntentDaily);
-        }
-        else if(alarm==2) {
-            if (alarmManager != null)
+        else if(alarm==2 && alarmManager != null)
                 alarmManager.cancel(pendingIntentMonthly);
-        }
     }
 
+    /**
+     * resume or start the alarm for the meant alarm based on in the integer alarm
+     * if the integer ==1, the daily alarm will be started
+     * otherwise the monthly alarm will be started
+     * @param alarmManager the main alarmManager
+     * @param alarm the integer refers for which pendingIntent will be started
+     */
     public void resumeAlarmManager( AlarmManager alarmManager,int alarm) {
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             Calendar calendar = Calendar.getInstance();
-
             if(alarm==1) {
                 calendar.set(Calendar.HOUR_OF_DAY, 16);
                 calendar.set(Calendar.MINUTE,1);
                 calendar.set(Calendar.SECOND,1);
                 calendar.set(Calendar.MILLISECOND,1);
-
-                 alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), 1000*60*60*24, pendingIntentDaily);
-                 //alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), 1000*60*3, pendingIntentDaily);
+                //alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), 1000*60*60*24, pendingIntentDaily);
+                alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), 1000*60*60*24, pendingIntentDaily);
             }
             else if(alarm==2){
-
                 calendar.set(Calendar.DAY_OF_MONTH,25);
                 calendar.set(Calendar.HOUR,16 );
                 calendar.set(Calendar.MINUTE, 1);
                 calendar.set(Calendar.SECOND, 1);
-                alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), 1000*60*60*24, pendingIntentMonthly);
+                //alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_MONTH, pendingIntentMonthly);
+                long repeatingInterval =  AlarmManager.INTERVAL_DAY * 30;
+                alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), repeatingInterval, pendingIntentMonthly);
             }
-
-
         }
     }
 
+    /**
+     * creates the notification channel
+     */
     public void createNotificationChannel(){
         CharSequence name = "ReminderChannel";
         String description=" Channel for reminding";
@@ -196,22 +179,6 @@ public class MainActivity extends AppCompatActivity {
         channel.setDescription(description);
         NotificationManager notificationManager= getSystemService(NotificationManager.class);
         notificationManager.createNotificationChannel(channel);
-
-        /* CharSequence name = "ReminderChannel";
-        String description=" Channel for reminding";
-        int importance = NotificationManager.IMPORTANCE_HIGH;
-        NotificationChannel channel= new NotificationChannel("channel2",name,importance);
-        Uri sound1 = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + this.getPackageName() + "/" + R.raw.sound1);
-        AudioAttributes attributes = new AudioAttributes.Builder()
-                .setUsage(AudioAttributes.USAGE_NOTIFICATION)
-                .build();
-        channel.setSound(sound1,attributes);
-
-        channel.setDescription(description);
-        NotificationManager notificationManager= getSystemService(NotificationManager.class);
-        notificationManager.createNotificationChannel(channel);
-
-        */
     }
     /**
      * save the application data in sharedPreferences as a HashMap<String, ArrayList<*>>() using Gson
@@ -238,11 +205,14 @@ public class MainActivity extends AppCompatActivity {
             String json = sharedPreferences.getString("data", null);
             Type type = new TypeToken<HashMap<String,ArrayList>>(){}.getType();
             appData = gson.fromJson(json, type);
-            System.out.println("");
-
         }
     }
 
+    /**
+     * when the menu is created if there is no background image so the remove option will be invisible
+     * @param menu the menu in the main activity
+     * @return true
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -254,6 +224,12 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * if the user click on set background so it will start the set background process
+     * if the user click on the remove background so the the remove background will be removed and the option will wbe invisible
+     * @param item the menu in the main activity
+     * @return true
+     */
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
@@ -266,10 +242,7 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
-
-
         }
-
     }
 
     /**
@@ -309,10 +282,8 @@ public class MainActivity extends AppCompatActivity {
      * set Background buttons function which goes to Background Activity using intent
      */
     public void setBackgroundGo(){
-
         Intent i  =  new Intent(this,BackgroundPage.class);
         startActivity(i);
-
     }
 
     @Override

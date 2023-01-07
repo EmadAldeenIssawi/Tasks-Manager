@@ -282,6 +282,8 @@ public class Calendar extends AppCompatActivity {
                     TableRow row = (TableRow) eventsDescriptionScrollView.getChildAt(i);
                     CheckBox cb = (CheckBox) row.getChildAt(0);
                     setInVisible(cb);
+                    row.setBackgroundColor(Integer.parseInt(String.valueOf(0xC3C6C8)));
+
                 }
                 selectClick--;
                 selectEventsButton.setBackgroundColor(ResourcesCompat.getColor(getResources(), R.color.naivy, null)); //without theme
@@ -328,13 +330,7 @@ public class Calendar extends AppCompatActivity {
      * @param view Trash button
      */
     public void removeEvents(View view) {
-       int numChecked =0;
-        for (int i = 0; i < eventsDescriptionScrollView.getChildCount(); i++) {
-            TableRow r = (TableRow) eventsDescriptionScrollView.getChildAt(i);
-            CheckBox c = (CheckBox) r.getChildAt(0);
-            TextView t = (TextView) r.getChildAt(1);
-            if (c.isChecked() && t.getText()!="") numChecked++;
-        }
+        int numChecked =countCheckedCheckboxes()[0];
         if (((Objects.requireNonNull(eventsOnDate.get(selectedDate)).size()==1)&&(numChecked!=0)) || numChecked == Objects.requireNonNull(eventsOnDate.get(selectedDate)).size()) {
             View vn = null;
             if (Objects.requireNonNull(datesWithEventsOnMonth.get(selectedMonth)).size()==1
@@ -358,10 +354,8 @@ public class Calendar extends AppCompatActivity {
             selectEvents(vr);
         }
         updateButtonsVisibility();
-        uploadAppData()
-
-
-
+        setInVisible(removeEventsButton);
+        uploadAppData();
     }
 
     /**
@@ -379,7 +373,6 @@ public class Calendar extends AppCompatActivity {
             for (int dayInt : Objects.requireNonNull(datesWithEventsOnMonth.get(selectedMonth))
             ) {
                 LocalDate d = LocalDate.of(selectedDate.getYear(), selectedMonth, dayInt);
-
                 if (eventsOnDate.get(d) != null) {
                     eventsOnDate.remove(d);
                 }
@@ -389,10 +382,27 @@ public class Calendar extends AppCompatActivity {
         emptyEventsDates();
         emptyEvents();
         selectEventsButton.setBackgroundColor(ResourcesCompat.getColor(getResources(), R.color.naivy, null)); //without theme
-
-
         updateButtonsVisibility();
         uploadAppData();
+    }
+
+    /**
+     * count how many checked boxes are checked and return the result
+     * and decide which last index have a checked checkbox
+     * @return  how many checked boxes are checked and the last index have a checked checkbox
+     */
+    private int [] countCheckedCheckboxes(){
+        int [] numCheckedAndIndex = {0,0};
+        for (int i = 0; i < eventsDescriptionScrollView.getChildCount(); i++) {
+            TableRow r = (TableRow) eventsDescriptionScrollView.getChildAt(i);
+            CheckBox c = (CheckBox) r.getChildAt(0);
+            TextView t = (TextView) r.getChildAt(1);
+            if (c.isChecked() && t.getText()!="") {
+                numCheckedAndIndex[0]++;
+                numCheckedAndIndex[1]=i;
+            }
+        }
+        return numCheckedAndIndex;
     }
 
     /**
@@ -463,27 +473,22 @@ public class Calendar extends AppCompatActivity {
      */
     private void downloadAllData() {
         if (MainActivity.appData.containsKey("eventsOnDateEvents") && eventsOnDate.isEmpty()&&MainActivity.appData.get("eventsOnDateEvents") != null) {
-
-            for (int i = 0; i < MainActivity.appData.get("eventsOnDateEvents").size(); i++) {
+            for (int i = 0; i < Objects.requireNonNull(MainActivity.appData.get("eventsOnDateEvents")).size(); i++) {
                 try {
-                    LinkedTreeMap ll = (LinkedTreeMap) MainActivity.appData.get("eventsOnDateEvents").get(i);
+                    LinkedTreeMap ll = (LinkedTreeMap) Objects.requireNonNull(MainActivity.appData.get("eventsOnDateEvents")).get(i);
                     loadEventsOnDates(ll);
-
                 }catch (Exception e){
-                    HashMap ll = (HashMap) MainActivity.appData.get("eventsOnDateEvents").get(i);
+                    HashMap ll = (HashMap) Objects.requireNonNull(MainActivity.appData.get("eventsOnDateEvents")).get(i);
                     loadEventsOnDates(ll);
                 }
             }
-
         }
         if (MainActivity.appData.containsKey("monthlyEventsDaysTextViews") && datesWithEventsOnMonth.isEmpty()&&MainActivity.appData.get("monthlyEventsDaysTextViews") != null) {
-
             try {
-                LinkedTreeMap a = (LinkedTreeMap) MainActivity.appData.get("monthlyEventsDaysTextViews").get(0);
+                LinkedTreeMap a = (LinkedTreeMap) Objects.requireNonNull(MainActivity.appData.get("monthlyEventsDaysTextViews")).get(0);
                 downloadMonthlyEventsDaysTextViews(a);
-
             } catch (Exception e) {
-                HashMap a = (HashMap) MainActivity.appData.get("monthlyEventsDaysTextViews").get(0);
+                HashMap a = (HashMap) Objects.requireNonNull(MainActivity.appData.get("monthlyEventsDaysTextViews")).get(0);
                 downloadMonthlyEventsDaysTextViews(a);
             }
         }
@@ -571,17 +576,17 @@ public class Calendar extends AppCompatActivity {
                 CheckBox c = (CheckBox) r.getChildAt(0);
                 if (c.isChecked()) {
                     setVisible(removeEventsButton);
-
                     checkVariables.add(i,1);
                     thereCheckBoxChecked=true;
+                    r.setBackgroundColor(Color.GRAY);
                 } else if (!c.isChecked()) {
                     checkVariables.add(i,0);
+                    r.setBackgroundColor(Integer.parseInt(String.valueOf(0xC3C6C8)));
                 }
             }
             if (!thereCheckBoxChecked) {
                 setInVisible(removeEventsButton);
             }
-
         }
     }
 }
